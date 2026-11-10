@@ -117,9 +117,16 @@ footer a{color:var(--muted)}
 
 /* ===== Stark single-page app (root only) ===== */
 /* No visible scrollbar — the page still scrolls, endlessly. */
-html.stark-page{scrollbar-width:none;-ms-overflow-style:none}
+html.stark-page{scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior:none}
 html.stark-page::-webkit-scrollbar{display:none;width:0;height:0}
-body.stark{background:#0a0a0a;color:#f5f5f2;overflow:hidden;height:100dvh}
+body.stark{background:#0a0a0a;color:#f5f5f2;overflow:hidden;height:100dvh;overscroll-behavior:none}
+.bg-item{
+  position:absolute;left:0;top:0;white-space:nowrap;line-height:1;
+  font-family:var(--serif);font-weight:700;letter-spacing:-.02em;
+  color:rgba(255,255,255,.08);will-change:transform;user-select:none;
+}
+.bg-item--outline{color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.28)}
+.bg-item--mono{font-family:var(--mono);font-weight:400;letter-spacing:.02em}
 body.stark a{color:#f5f5f2}
 body.stark :focus-visible{outline:2px solid #fff;outline-offset:3px}
 body.stark code{background:#222;color:#fff}
