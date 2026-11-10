@@ -1,4 +1,4 @@
-// Single-page app: hash router + endless scroll backdrop.
+// Single-page app: hash router + mouse-wheel backdrop. The page itself never scrolls.
 (function () {
   "use strict";
 
@@ -33,20 +33,13 @@
   window.addEventListener("hashchange", render);
   render();
 
-  /* ---------- Endless scroll backdrop ---------- */
+  /* ---------- Backdrop: mouse wheel moves it, page stays put ---------- */
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var layers = Array.prototype.slice.call(document.querySelectorAll(".bg-layer"));
   if (reduceMotion || !layers.length) return;
 
-  var LOOP = window.innerHeight * 3; // one full loop of scroll room
   var bgOffset = 0;
-  var lastY = window.scrollY;
-  var adjusting = false;
   var ticking = false;
-
-  // Start mid-page so you can scroll up or down forever.
-  window.scrollTo(0, LOOP);
-  lastY = window.scrollY;
 
   function paint() {
     ticking = false;
@@ -60,35 +53,19 @@
     });
   }
 
-  function onScroll() {
-    var y = window.scrollY;
-    var delta = y - lastY;
-
-    // Our own loop-jump fires a scroll event too — don't count it as motion.
-    if (adjusting) {
-      lastY = y;
-      adjusting = false;
-      return;
-    }
+  window.addEventListener("wheel", function (e) {
+    // Wheel inside an open project panel scrolls the panel, not the backdrop.
+    if (e.target && e.target.closest && e.target.closest(".panel")) return;
+    var delta = e.deltaY;
+    if (e.deltaMode === 1) delta *= 16;                    // lines → px
+    else if (e.deltaMode === 2) delta *= window.innerHeight; // pages → px
     bgOffset += delta;
-    lastY = y;
-
-    // Wrap around silently: the backdrop never ends.
-    if (y > LOOP * 2) {
-      adjusting = true;
-      window.scrollTo(0, y - LOOP);
-    } else if (y < LOOP * 0.5) {
-      adjusting = true;
-      window.scrollTo(0, y + LOOP);
-    }
-
     if (Math.abs(bgOffset) > 40) document.body.classList.add("scrolled");
     if (!ticking) {
       ticking = true;
       window.requestAnimationFrame(paint);
     }
-  }
+  }, { passive: true });
 
-  window.addEventListener("scroll", onScroll, { passive: true });
   paint();
 })();
