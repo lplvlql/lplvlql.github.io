@@ -148,11 +148,7 @@ body.stark code{background:#222;color:#fff}
   font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
   color:rgba(255,255,255,.55);text-decoration:none;
 }
-.stark-corner--tl{top:20px;left:24px;color:#fff}
-.stark-corner--tr{top:20px;right:24px}
-.stark-corner--bl{bottom:20px;left:24px}
-.stark-corner--br{bottom:20px;right:24px}
-.stark-corner--br:hover{color:#fff;text-decoration:underline}
+.stark-corner--bc{bottom:22px;left:50%;transform:translateX(-50%)}
 body.stark.scrolled #scroll-hint{opacity:0}
 #scroll-hint{transition:opacity .4s ease}
 .view{position:fixed;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;padding:24px}
