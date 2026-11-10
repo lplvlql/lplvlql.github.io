@@ -3,76 +3,110 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>lplvlql — project hub</title>
-<meta name="description" content="One hub, four projects. Each project has its own site.">
+<title>lplvlql</title>
+<meta name="description" content="lplvlql — Chronicle, Ledger, Usual Time, mister-simp.">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
-<header class="topbar">
-  <a class="wordmark" href="./">lplvlql</a>
-  <span class="topbar-note">project hub</span>
-  <nav class="topnav" aria-label="Projects">
-    <a href="chronicle/">Chronicle</a>
-    <a href="ledger/">Ledger</a>
-    <a href="usual-time/">Usual Time</a>
-    <a href="mister-simp/">mister-simp</a>
-  </nav>
-</header>
-
-<main>
-  <div class="hub-head">
-    <h1>Four projects.<br>One front door.</h1>
-    <p class="lede">This page is just the index. Every project below has its own site with its own docs, status, and downloads — follow the link, not a card preview.</p>
-    <label class="filter">
-      <span>Filter the index</span>
-      <input id="filter" type="search" placeholder="Try “audio”, “cards”, “Go”…" autocomplete="off">
-    </label>
+<body class="stark">
+  <div class="stark-bg" aria-hidden="true">
+    <div class="bg-layer" data-speed="0.30">
+      <div class="bg-seq"><span>CHRONICLE</span><span>LEDGER</span><span>USUAL TIME</span><span>MISTER-SIMP</span></div>
+      <div class="bg-seq"><span>CHRONICLE</span><span>LEDGER</span><span>USUAL TIME</span><span>MISTER-SIMP</span></div>
+    </div>
+    <div class="bg-layer bg-layer--alt" data-speed="0.65">
+      <div class="bg-seq"><span>240 CARDS</span><span>BY CID</span><span>DELAY / LOOP</span><span>/MEDIA/FAT</span></div>
+      <div class="bg-seq"><span>240 CARDS</span><span>BY CID</span><span>DELAY / LOOP</span><span>/MEDIA/FAT</span></div>
+    </div>
   </div>
 
-  <table class="index-table">
-    <thead>
-      <tr><th>Project</th><th>What it is</th><th>Stack</th><th>Site</th></tr>
-    </thead>
-    <tbody id="index-body">
-      <tr data-tags="chronicle cards tabletop game print prototype simulator python">
-        <td class="p-name"><a href="chronicle/">Chronicle</a></td>
-        <td>Tabletop card-game design and playtest workspace — 240 canonical cards across six Regions, a printable prototype, and a deterministic simulator.</td>
-        <td class="p-meta">Python · print</td>
-        <td><a class="go" href="chronicle/">Open site →</a></td>
-      </tr>
-      <tr data-tags="ledger protocol parcel wizard poker go p2p files cid cli desktop game">
-        <td class="p-name"><a href="ledger/">Ledger</a></td>
-        <td>Content-addressed give/take protocol in Go, plus the things built on it: Parcel (desktop file sharing) and Wizard Poker (one-table Flash Poker).</td>
-        <td class="p-meta">Go · HTTP</td>
-        <td><a class="go" href="ledger/">Open site →</a></td>
-      </tr>
-      <tr data-tags="usual time daisy terrarium dsp audio delay loop sample mac firmware c">
-        <td class="p-name"><a href="usual-time/">Usual Time</a></td>
-        <td>Mono delay, Loop/Sample memory, and immediate DIRECT effects for Daisy Terrarium. The Mac audition app shares the same DSP.</td>
-        <td class="p-meta">C · Daisy · macOS</td>
-        <td><a class="go" href="usual-time/">Open site →</a></td>
-      </tr>
-      <tr data-tags="mister simp mister fpga sd card script shell layout games">
-        <td class="p-name"><a href="mister-simp/">mister-simp</a></td>
-        <td>One script that migrates a standard MiSTer SD-card layout into a simplified one — and keeps the helper scripts current on later runs.</td>
-        <td class="p-meta">Shell · MiSTer</td>
-        <td><a class="go" href="mister-simp/">Open site →</a></td>
-      </tr>
-    </tbody>
-  </table>
-  <p id="no-match" class="no-match" hidden>No project matches that. <button id="clear-filter" type="button">Clear filter</button></p>
+  <p class="stark-corner stark-corner--tl">lplvlql</p>
+  <p class="stark-corner stark-corner--tr">hub</p>
+  <p class="stark-corner stark-corner--bl" id="scroll-hint">scroll ↓</p>
+  <a class="stark-corner stark-corner--br" href="https://github.com/lplvlql">github</a>
 
-  <section class="hub-foot-note">
-    <h2>How this hub is organized</h2>
-    <p>Each project keeps its own pages, voice, and release notes under its own path (<code>/chronicle/</code>, <code>/ledger/</code>, <code>/usual-time/</code>, <code>/mister-simp/</code>). This root page only points at them. Hosted on GitHub Pages for now; the same static files move as-is when the hub moves to Ledger hosting.</p>
-  </section>
-</main>
+  <main id="app">
+    <!-- HOME: buttons, dead center, stacked -->
+    <section class="view view--home" id="view-home" aria-label="Projects">
+      <nav class="stark-stack">
+        <a class="stark-btn" href="#/chronicle">Chronicle</a>
+        <a class="stark-btn" href="#/ledger">Ledger</a>
+        <a class="stark-btn" href="#/usual-time">Usual Time</a>
+        <a class="stark-btn" href="#/mister-simp">mister-simp</a>
+      </nav>
+    </section>
 
-<footer>
-  <span>lplvlql</span>
-  <span id="year"></span>
-  <a href="https://github.com/lplvlql">github.com/lplvlql</a>
-</footer>
+    <!-- CHRONICLE -->
+    <section class="view" id="view-chronicle" hidden aria-labelledby="t-chronicle">
+      <div class="panel">
+        <a class="panel-back" href="#/">← all projects</a>
+        <h1 id="t-chronicle" tabindex="-1">Chronicle</h1>
+        <p class="panel-lede">Tabletop card-game design and playtest workspace: 240 canonical cards across six Regions, a printable prototype, and a deterministic simulator for checking card behavior and play outcomes.</p>
+        <p class="panel-meta">240 cards · 6 Regions · print + simulator · local project</p>
+        <h2>Start here</h2>
+        <ul>
+          <li><strong>Play:</strong> play guide, player aid, rules reference.</li>
+          <li><strong>Make cards:</strong> card design, families, art direction, production.</li>
+          <li><strong>Build &amp; test:</strong> prototype kit, simulation smoke, production checks.</li>
+        </ul>
+        <p>Validate the full 240-card set, inspect one card with timing and references, generate staged art prompts, or build the printable PDF — including a white-card playtest kit.</p>
+      </div>
+    </section>
+
+    <!-- LEDGER -->
+    <section class="view" id="view-ledger" hidden aria-labelledby="t-ledger">
+      <div class="panel">
+        <a class="panel-back" href="#/">← all projects</a>
+        <h1 id="t-ledger" tabindex="-1">Ledger</h1>
+        <p class="panel-lede">Minimal content-addressed give/take. Live peers use HTTP today; CIDs and local state stay transport-neutral.</p>
+        <p class="panel-meta">Go · CID addressing · HTTP today · 4 repos, one-way deps</p>
+        <h2>The four parts</h2>
+        <ul>
+          <li><strong>Protocol (CLI Ledger)</strong> — standalone Go core. Shares bytes by CID. <a href="https://github.com/lplvlql/cli-ledger">GitHub →</a></li>
+          <li><strong>Parcel</strong> — desktop file sharing on Ledger. Scans a folder, serves it, joins via invites or <code>ledger://</code> links.</li>
+          <li><strong>Wizard Poker</strong> — one-table Flash Poker vs three local bots. Boots straight to the felt; knock to commit.</li>
+          <li><strong>Parcel Pocket</strong> — future phone companion. Planned, not built yet.</li>
+        </ul>
+        <p>This hub is plain static files — the plan is to serve it from Ledger itself later, no rebuild needed.</p>
+      </div>
+    </section>
+
+    <!-- USUAL TIME -->
+    <section class="view" id="view-usual-time" hidden aria-labelledby="t-usual-time">
+      <div class="panel">
+        <a class="panel-back" href="#/">← all projects</a>
+        <h1 id="t-usual-time" tabindex="-1">Usual Time</h1>
+        <p class="panel-lede">Mono delay, Loop/Sample memory, and immediate DIRECT effects for Daisy Terrarium. The Mac audition app shares the DSP — what you hear on the desk is what the hardware runs.</p>
+        <p class="panel-meta">Daisy Terrarium · delay / loop / DIRECT · Mac app · local project</p>
+        <h2>Docs</h2>
+        <ul>
+          <li><strong>Specification:</strong> every band, mode/switch interaction, constraints.</li>
+          <li><strong>Manual:</strong> controls and gestures.</li>
+          <li><strong>Architecture:</strong> modules, algorithms, settings, ownership.</li>
+          <li><strong>Testing:</strong> validation commands and acceptance gates.</li>
+        </ul>
+        <p>Firmware: <code>make all</code>. Mac app: <code>make -C app all</code>. Recipe choice matters — defaults don't always reproduce an archived image.</p>
+      </div>
+    </section>
+
+    <!-- MISTER-SIMP -->
+    <section class="view" id="view-mister-simp" hidden aria-labelledby="t-mister-simp">
+      <div class="panel">
+        <a class="panel-back" href="#/">← all projects</a>
+        <h1 id="t-mister-simp" tabindex="-1">mister-simp</h1>
+        <p class="panel-lede">One script that migrates a standard MiSTer SD-card layout into a simplified one — and keeps the helper scripts current on later runs.</p>
+        <p class="panel-meta">Shell · targets /media/fat · <a href="https://github.com/lplvlql/mister-simp">github.com/lplvlql/mister-simp</a></p>
+        <h2>What it does</h2>
+        <ul>
+          <li>Keeps required root files/folders; removes everything off the allowlists.</li>
+          <li>Normalizes folder names to the canonical layout.</li>
+          <li>Installs helpers into <code>scripts/</code>: clean, update, cache, random, last, delete.</li>
+        </ul>
+        <p>Run <code>mister-simp.sh</code> from <code>scripts/</code> on the MiSTer. No argument = <code>/media/fat</code>; pass a path to target something else.</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="stark-scroll" aria-hidden="true"></div>
 <script src="script.js"></script>
 </body>
 </html>
