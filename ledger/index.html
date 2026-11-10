@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ledger — lplvlql</title>
+<meta name="description" content="Content-addressed give/take protocol in Go, plus Parcel and Wizard Poker built on it.">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="wordmark" href="../">lplvlql</a>
+  <span class="topbar-note">/ ledger</span>
+  <nav class="topnav" aria-label="Projects">
+    <a href="../">Hub</a><a href="../chronicle/">Chronicle</a><a href="../usual-time/">Usual Time</a><a href="../mister-simp/">mister-simp</a>
+  </nav>
+</header>
+<main class="doc">
+  <a class="crumb" href="../">← Back to hub</a>
+  <h1>Ledger</h1>
+  <p class="lede">Minimal content-addressed give/take. Live peers use HTTP today; CIDs and local state stay transport-neutral — so the protocol outlives any one transport.</p>
+  <div class="facts">
+    <div class="fact"><b>Core</b><span>Go binary</span></div>
+    <div class="fact"><b>Addressing</b><span>CID</span></div>
+    <div class="fact"><b>Transport</b><span>HTTP (today)</span></div>
+    <div class="fact"><b>Repos</b><span>4, one-way deps</span></div>
+  </div>
+  <section>
+    <h2>The four parts</h2>
+    <p>Dependencies run one way only: nothing in the protocol imports from its siblings, and there is no shared library or workspace module.</p>
+  </section>
+  <div class="sub-list">
+    <div class="sub-item">
+      <h3>Protocol — CLI Ledger</h3>
+      <p>The standalone portable Go core plus checks. Shares bytes by CID; the Go binary is the product runtime. Needs a built Ledger binary and a folder of files.</p>
+      <p><a href="https://github.com/lplvlql/cli-ledger">github.com/lplvlql/cli-ledger →</a> <span class="tag">standalone</span></p>
+    </div>
+    <div class="sub-item">
+      <h3>Parcel</h3>
+      <p>Desktop file-sharing app using Ledger. Scans a folder, serves it, joins peers from invites or <code>ledger://</code> links, and fetches verified bytes. Ships as <code>Parcel.app</code>.</p>
+      <p><span class="tag">desktop app</span></p>
+    </div>
+    <div class="sub-item">
+      <h3>Wizard Poker</h3>
+      <p>One-table Flash Poker: you plus three local bots on a persistent portrait felt. Boots straight to the table — no login, lobbies, menus, or shop. Phone-first machine with stations, suit cartridges, community rail, and knock-to-commit gestures.</p>
+      <p><span class="tag">game</span></p>
+    </div>
+    <div class="sub-item">
+      <h3>Parcel Pocket</h3>
+      <p>Future phone companion to Parcel. Placeholder for now — no dependencies, no implementation yet.</p>
+      <p><span class="tag">planned</span></p>
+    </div>
+  </div>
+  <section style="margin-top:30px">
+    <h2>Hosting note</h2>
+    <p>This hub currently lives on GitHub Pages. The plan is to host it on Ledger itself later — the site is plain static files with relative links, so it moves without a rebuild.</p>
+  </section>
+</main>
+<footer><span>lplvlql / ledger</span><a href="../">Hub</a><a href="https://github.com/lplvlql/cli-ledger">CLI Ledger on GitHub</a></footer>
+<script src="../script.js"></script>
+</body>
+</html>

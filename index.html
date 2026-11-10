@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lplvlql — project hub</title>
+<meta name="description" content="One hub, four projects. Each project has its own site.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="wordmark" href="./">lplvlql</a>
+  <span class="topbar-note">project hub</span>
+  <nav class="topnav" aria-label="Projects">
+    <a href="chronicle/">Chronicle</a>
+    <a href="ledger/">Ledger</a>
+    <a href="usual-time/">Usual Time</a>
+    <a href="mister-simp/">mister-simp</a>
+  </nav>
+</header>
+
+<main>
+  <div class="hub-head">
+    <h1>Four projects.<br>One front door.</h1>
+    <p class="lede">This page is just the index. Every project below has its own site with its own docs, status, and downloads — follow the link, not a card preview.</p>
+    <label class="filter">
+      <span>Filter the index</span>
+      <input id="filter" type="search" placeholder="Try “audio”, “cards”, “Go”…" autocomplete="off">
+    </label>
+  </div>
+
+  <table class="index-table">
+    <thead>
+      <tr><th>Project</th><th>What it is</th><th>Stack</th><th>Site</th></tr>
+    </thead>
+    <tbody id="index-body">
+      <tr data-tags="chronicle cards tabletop game print prototype simulator python">
+        <td class="p-name"><a href="chronicle/">Chronicle</a></td>
+        <td>Tabletop card-game design and playtest workspace — 240 canonical cards across six Regions, a printable prototype, and a deterministic simulator.</td>
+        <td class="p-meta">Python · print</td>
+        <td><a class="go" href="chronicle/">Open site →</a></td>
+      </tr>
+      <tr data-tags="ledger protocol parcel wizard poker go p2p files cid cli desktop game">
+        <td class="p-name"><a href="ledger/">Ledger</a></td>
+        <td>Content-addressed give/take protocol in Go, plus the things built on it: Parcel (desktop file sharing) and Wizard Poker (one-table Flash Poker).</td>
+        <td class="p-meta">Go · HTTP</td>
+        <td><a class="go" href="ledger/">Open site →</a></td>
+      </tr>
+      <tr data-tags="usual time daisy terrarium dsp audio delay loop sample mac firmware c">
+        <td class="p-name"><a href="usual-time/">Usual Time</a></td>
+        <td>Mono delay, Loop/Sample memory, and immediate DIRECT effects for Daisy Terrarium. The Mac audition app shares the same DSP.</td>
+        <td class="p-meta">C · Daisy · macOS</td>
+        <td><a class="go" href="usual-time/">Open site →</a></td>
+      </tr>
+      <tr data-tags="mister simp mister fpga sd card script shell layout games">
+        <td class="p-name"><a href="mister-simp/">mister-simp</a></td>
+        <td>One script that migrates a standard MiSTer SD-card layout into a simplified one — and keeps the helper scripts current on later runs.</td>
+        <td class="p-meta">Shell · MiSTer</td>
+        <td><a class="go" href="mister-simp/">Open site →</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <p id="no-match" class="no-match" hidden>No project matches that. <button id="clear-filter" type="button">Clear filter</button></p>
+
+  <section class="hub-foot-note">
+    <h2>How this hub is organized</h2>
+    <p>Each project keeps its own pages, voice, and release notes under its own path (<code>/chronicle/</code>, <code>/ledger/</code>, <code>/usual-time/</code>, <code>/mister-simp/</code>). This root page only points at them. Hosted on GitHub Pages for now; the same static files move as-is when the hub moves to Ledger hosting.</p>
+  </section>
+</main>
+
+<footer>
+  <span>lplvlql</span>
+  <span id="year"></span>
+  <a href="https://github.com/lplvlql">github.com/lplvlql</a>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>

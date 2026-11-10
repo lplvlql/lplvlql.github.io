@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mister-simp — lplvlql</title>
+<meta name="description" content="One script that migrates a standard MiSTer SD-card layout into a simplified layout.">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="wordmark" href="../">lplvlql</a>
+  <span class="topbar-note">/ mister-simp</span>
+  <nav class="topnav" aria-label="Projects">
+    <a href="../">Hub</a><a href="../chronicle/">Chronicle</a><a href="../ledger/">Ledger</a><a href="../usual-time/">Usual Time</a>
+  </nav>
+</header>
+<main class="doc">
+  <a class="crumb" href="../">← Back to hub</a>
+  <h1>mister-simp</h1>
+  <p class="lede">One script that migrates a standard MiSTer card layout into the simplified layout — keeping only what the allowlists require, and keeping the helpers current on later runs.</p>
+  <div class="facts">
+    <div class="fact"><b>Target</b><span>/media/fat (default)</span></div>
+    <div class="fact"><b>Form</b><span>Shell script</span></div>
+    <div class="fact"><b>Repo</b><span><a href="https://github.com/lplvlql/mister-simp">lplvlql/mister-simp</a></span></div>
+  </div>
+  <section>
+    <h2>What it does</h2>
+    <ul>
+      <li>Keeps the required root files and folders; removes everything not on the allowlists.</li>
+      <li>Normalizes folder names to the canonical layout.</li>
+      <li>Installs the persistent helper scripts into <code>scripts/</code> and keeps them current.</li>
+    </ul>
+    <p>On MiSTer, run <code>mister-simp.sh</code> from <code>scripts/</code>. With no argument it targets <code>/media/fat</code>; pass a target path to run elsewhere. Example before/after trees live in the repo's <code>examples/</code>.</p>
+  </section>
+  <section>
+    <h2>Helper scripts</h2>
+    <ul>
+      <li><code>clean.sh</code> — prunes and normalizes the layout</li>
+      <li><code>update.sh</code> — syncs core files, game data, and helper scripts</li>
+      <li><code>cache.sh</code> — builds the random-game cache</li>
+      <li><code>random.sh</code> — picks a cached game and launches it</li>
+      <li><code>last.sh</code> — reloads the last generated launch file</li>
+      <li><code>delete.sh</code> — deletes the selected game and clears the launch file</li>
+    </ul>
+  </section>
+</main>
+<footer><span>lplvlql / mister-simp</span><a href="../">Hub</a><a href="https://github.com/lplvlql/mister-simp">GitHub repo</a></footer>
+<script src="../script.js"></script>
+</body>
+</html>
