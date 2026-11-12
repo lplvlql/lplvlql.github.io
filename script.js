@@ -1,96 +1,46 @@
-// Single-page app: hash router + mouse-wheel backdrop. The page itself never scrolls.
+// One page, three buttons, one living sphere of connected points.
+// The page itself never scrolls; the sphere deforms around you.
 (function () {
   "use strict";
 
-  /* ---------- Router: #/ is home, #/chronicle etc. open in place ---------- */
-  var ROUTES = ["home", "chronicle", "ledger", "usual-time", "mister-simp"];
-  var TITLES = {
-    home: "lplvlql",
-    chronicle: "Chronicle — lplvlql",
-    ledger: "Ledger — lplvlql",
-    "usual-time": "Usual Time — lplvlql",
-    "mister-simp": "mister-simp — lplvlql"
-  };
-
-  function routeFromHash() {
-    var name = window.location.hash.replace(/^#\/?/, "").split("/")[0];
-    return ROUTES.indexOf(name) !== -1 ? name : "home";
-  }
-
-  function render() {
-    var route = routeFromHash();
-    ROUTES.forEach(function (name) {
-      var el = document.getElementById("view-" + name);
-      if (el) el.hidden = name !== route;
-    });
-    document.title = TITLES[route];
-    if (route !== "home") {
-      var heading = document.querySelector("#view-" + route + " h1");
-      if (heading) heading.focus({ preventScroll: true });
-    }
-  }
-
-  window.addEventListener("hashchange", render);
-  render();
-
-  /* ---------- Backdrop: point cloud morphing through shapes ----------
-     168 points hold a slowly rotating 3D shape behind the buttons.
-     Each cycle: hold the shape -> burst outward to random points ->
-     regroup as the next shape (circle, line, triangle, square, ...).
-     The page never scrolls (Safari-safe): wheel/touch only add speed. */
   var canvas = document.getElementById("bg-canvas");
   if (!canvas || !canvas.getContext) return;
   var ctx = canvas.getContext("2d");
   if (!ctx) return;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  var N = 168;
-  var SHAPES = ["circle", "line", 3, 4, 5, 6, 7, 8]; // then back to circle
-  var W = 0, H = 0, boost = 0;
-  var stage = 0, stageT = 0, lastPhase = -1, rot = 0;
+  var Y = 3000; // points in the network
+  var W = 0, H = 0, lastFrame = null;
 
-  function rand(min, max) { return min + Math.random() * (max - min); }
-
-  function polygonPoint(k, i) {
-    var verts = [], j, a;
-    for (j = 0; j < k; j++) {
-      a = -Math.PI / 2 + (k % 2 === 0 ? Math.PI / k : 0) + j * Math.PI * 2 / k;
-      verts.push([Math.cos(a) * 0.82, Math.sin(a) * 0.82]);
-    }
-    var s = i / N * k, side = Math.floor(s) % k, f = s - Math.floor(s);
-    var p = verts[side], q = verts[(side + 1) % k];
-    return [p[0] + (q[0] - p[0]) * f, p[1] + (q[1] - p[1]) * f, 0];
+  // Small seeded RNG, so the point set is identical on every load.
+  function mulberry(seed) {
+    return function () {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
   }
 
-  function shapePoint(shape, i) {
-    if (shape === "circle") {
-      var a = i / N * Math.PI * 2;
-      return [Math.cos(a) * 0.82, Math.sin(a) * 0.82, 0];
-    }
-    if (shape === "line") {
-      return [-0.88 + 1.76 * (i / (N - 1)), 0, 0];
-    }
-    return polygonPoint(shape, i);
-  }
-
-  function scatterPoint() {
-    var u = rand(-1, 1), th = rand(0, Math.PI * 2), r = rand(1.3, 2.4);
-    var s = Math.sqrt(1 - u * u) * r;
-    return [Math.cos(th) * s, Math.sin(th) * s, u * r];
-  }
-
-  var pts = [];
-  for (var i = 0; i < N; i++) {
-    var start = shapePoint("circle", i);
-    pts.push({ x: start[0], y: start[1], z: start[2], tx: start[0], ty: start[1], tz: start[2],
-      size: rand(1, 2.4), tw: rand(0, Math.PI * 2) });
-  }
-
-  function setTargets(kind, shapeIdx) {
-    for (var j = 0; j < N; j++) {
-      var t = kind === "scatter" ? scatterPoint() : shapePoint(SHAPES[shapeIdx], j);
-      pts[j].tx = t[0]; pts[j].ty = t[1]; pts[j].tz = t[2];
-    }
+  // The points: a Fibonacci sphere with seeded jitter — irregular
+  // but evenly spread, fixed forever. One sphere, no stages.
+  var DIRS = new Float32Array(Y * 3);
+  var rng = mulberry(42);
+  for (var di = 0; di < Y; di++) {
+    var dy0 = 1 - ((di + 0.5) / Y) * 2;
+    var dr0 = Math.sqrt(Math.max(0, 1 - dy0 * dy0)), dth0 = di * 2.4;
+    var fx = Math.cos(dth0) * dr0, fy = dy0, fz = Math.sin(dth0) * dr0;
+    var ja = rng() * Math.PI * 2, jm = rng() * 0.03;
+    var tx = -fz, tz = fx;
+    var tl = Math.sqrt(tx * tx + tz * tz) || 1;
+    var ox = (tx / tl) * Math.cos(ja) + (-fy * (tz / tl)) * Math.sin(ja);
+    var oy = dr0 * Math.sin(ja);
+    var oz = (tz / tl) * Math.cos(ja) + (fy * (tx / tl)) * Math.sin(ja);
+    var gx = fx + ox * jm, gy = fy + oy * jm, gz = fz + oz * jm;
+    var gl = Math.sqrt(gx * gx + gy * gy + gz * gz) || 1;
+    DIRS[di * 3] = gx / gl;
+    DIRS[di * 3 + 1] = gy / gl;
+    DIRS[di * 3 + 2] = gz / gl;
   }
 
   function resize() {
@@ -100,101 +50,238 @@
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-  window.addEventListener("resize", resize);
+  window.addEventListener("resize", function () {
+    resize();
+    // Resizing clears the canvas; reduced-motion has no loop
+    // to repaint it, so redraw the static frame explicitly.
+    if (reduceMotion) drawStatic();
+  });
   resize();
 
-  function project(now) {
-    var cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.37;
-    var tilt = Math.sin(now * 0.00021) * 0.38;
-    var cy1 = Math.cos(rot), sy1 = Math.sin(rot), cx1 = Math.cos(tilt), sx1 = Math.sin(tilt);
-    var out = [];
-    for (var j = 0; j < N; j++) {
-      var p = pts[j];
-      var y1 = p.y * cx1 - p.z * sx1, z1 = p.y * sx1 + p.z * cx1;
-      var x2 = p.x * cy1 + z1 * sy1, z2 = -p.x * sy1 + z1 * cy1;
-      var s = 1 / (1 + z2 * 0.32);
-      out.push({ x: cx + x2 * R * s, y: cy + y1 * R * s, s: s,
-        a: Math.max(0.12, Math.min(1, (s - 0.72) / 0.5)) * (0.78 + 0.22 * Math.sin(now * 0.003 + p.tw)),
-        r: p.size * s + 0.4 });
+  // Elastic state: each point has an offset from its home position
+  // and a velocity. Springs pull offsets toward a moving target
+  // (idle waves + cursor + gravity), slightly underdamped, so the
+  // surface overshoots a little as it settles.
+  var OFF = new Float32Array(Y * 3), VEL = new Float32Array(Y * 3);
+  var sx = new Float32Array(Y), sy = new Float32Array(Y), sf = new Float32Array(Y);
+  var vx = new Float32Array(Y), vy = new Float32Array(Y), vz = new Float32Array(Y);
+
+  // Cursor attractor (world space, on the front of the sphere) and
+  // how much energy the cursor has right now. Energy builds while
+  // the mouse moves and decays when it stops — that decay is what
+  // lets the surface relax.
+  var attrX = 0, attrY = 0, attrZ = -3 / 5, attrTX = 0, attrTY = 0, energy = 0;
+  // Gravity direction from phone tilt (unit-ish), 0 = none.
+  var gravX = 0, gravY = 0, gravAmt = 0;
+
+  function stepElastic(now, dtMs) {
+    var t = now / 1000;
+    var step = Math.min(3, dtMs / 16.7);
+    energy *= Math.exp(-dtMs / 1200);
+    // The attractor itself eases toward the cursor: weight.
+    var ae = 1 - Math.exp(-dtMs / 150);
+    attrX += (attrTX - attrX) * ae;
+    attrY += (attrTY - attrY) * ae;
+    var attrLen = Math.sqrt(attrX * attrX + attrY * attrY + attrZ * attrZ) || 1;
+    var ax = attrX / attrLen * 3 / 4, ay = attrY / attrLen * 3 / 4, az = attrZ / attrLen * 3 / 4;
+    // Autonomous swells: two broad regions that slowly drift all
+    // over the sphere (front and back alike), swelling and
+    // contracting on incommensurate timescales, so the motion
+    // never settles into a recognizable cycle.
+    var c1th = t * 0.021, c1ph = 1.1 + 0.7 * Math.sin(t * 0.017);
+    var c1 = [Math.sin(c1ph) * Math.cos(c1th), Math.cos(c1ph), Math.sin(c1ph) * Math.sin(c1th)];
+    var a1 = 0.045 * (0.5 + 0.5 * Math.sin(t * 0.09 + 1.7)) * (0.6 + 0.4 * Math.sin(t * 0.031));
+    var c2th = 2.5 - t * 0.016, c2ph = 2.0 + 0.6 * Math.sin(t * 0.023 + 4);
+    var c2 = [Math.sin(c2ph) * Math.cos(c2th), Math.cos(c2ph), Math.sin(c2ph) * Math.sin(c2th)];
+    var a2 = -0.035 * (0.5 + 0.5 * Math.sin(t * 0.073 + 0.3));
+    for (var j = 0; j < Y; j++) {
+      var k = j * 3;
+      var dx = DIRS[k], dy = DIRS[k + 1], dz = DIRS[k + 2];
+      var hx = dx * 3 / 4, hy = dy * 3 / 4, hz = dz * 3 / 4;
+      // Idle: slow low-frequency waves travelling across the
+      // surface, radial only — regions expand and contract.
+      var wave = Math.sin(dx * 2 + t * 0.35) + Math.sin(dy * 2 - t * 0.27) + Math.sin(dz * 2 + t * 0.31);
+      var radial = wave * 0.012;
+      // Plus the drifting swells, also radial, front and back.
+      var s1x = hx - c1[0] * 3 / 4, s1y = hy - c1[1] * 3 / 4, s1z = hz - c1[2] * 3 / 4;
+      radial += a1 * Math.exp(-(s1x * s1x + s1y * s1y + s1z * s1z) / (2 * 0.3025));
+      var s2x = hx - c2[0] * 3 / 4, s2y = hy - c2[1] * 3 / 4, s2z = hz - c2[2] * 3 / 4;
+      radial += a2 * Math.exp(-(s2x * s2x + s2y * s2y + s2z * s2z) / (2 * 0.49));
+      var tx2 = dx * radial, ty2 = dy * radial, tz2 = dz * radial;
+      // Cursor: nearby points are pulled toward the attractor,
+      // with smooth Gaussian falloff so neighbourhoods move as one.
+      // A second, much weaker and broader component reaches the
+      // far side, so the back answers subtly instead of sitting
+      // still — one continuous surface, depth-dependent response.
+      if (energy > 0.002) {
+        var ddx = hx - ax, ddy = hy - ay, ddz = hz - az;
+        var dd2 = ddx * ddx + ddy * ddy + ddz * ddz;
+        var w = Math.exp(-dd2 / (2 * 0.09)) * energy * 0.45;
+        tx2 += (ax - hx) * w; ty2 += (ay - hy) * w; tz2 += (az - hz) * w;
+        var wf = Math.exp(-dd2 / (2 * 0.5625)) * energy * 0.03;
+        tx2 += (ax / (3 / 4)) * wf; ty2 += (ay / (3 / 4)) * wf; tz2 += (az / (3 / 4)) * wf;
+      }
+      // Gravity: the whole network sags a little toward tilt.
+      if (gravAmt > 0.02) {
+        var gd = (dx * gravX + dy * gravY) * 0.05 * gravAmt;
+        tx2 += gravX * gd; ty2 += gravY * gd;
+      }
+      // Spring toward the target, underdamped: overshoot on settle.
+      for (var c = 0; c < 3; c++) {
+        var tgt = c === 0 ? tx2 : c === 1 ? ty2 : tz2;
+        VEL[k + c] = (VEL[k + c] + (tgt - OFF[k + c]) * 0.02 * step) * Math.pow(0.92, step);
+        OFF[k + c] += VEL[k + c] * step;
+      }
+      vx[j] = hx + OFF[k]; vy[j] = hy + OFF[k + 1]; vz[j] = hz + OFF[k + 2];
     }
-    return out;
   }
 
-  function draw(now) {
+  function draw() {
+    var cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2;
     ctx.clearRect(0, 0, W, H);
-    var scr = project(now);
-    ctx.fillStyle = "#fff";
-    for (var k = 0; k < N; k++) {
-      var q = scr[k];
-      ctx.globalAlpha = q.a;
+    ctx.fillStyle = "#1c1c1c";
+    for (var j = 0; j < Y; j++) {
+      var s = 1 / (1 + vz[j] / 4);
+      sx[j] = cx + vx[j] * R * s;
+      sy[j] = cy + vy[j] * R * s;
+      sf[j] = Math.max(0, Math.min(1, (3 / 4 - vz[j]) / (3 / 2)));
+    }
+    // Lines are dynamic: every frame, dots within 1/16 of each
+    // other (where they are right now) get a line. Closer = more
+    // opaque. Lines are bucketed by opacity so each bucket is
+    // a single stroke.
+    var buckets = [[], [], [], [], [], [], [], []];
+    var grid = new Map();
+    for (var gj = 0; gj < Y; gj++) {
+      var gk = Math.floor((vx[gj] + 1) * 16) + Math.floor((vy[gj] + 1) * 16) * 64 + Math.floor((vz[gj] + 1) * 16) * 4096;
+      if (!grid.has(gk)) grid.set(gk, []);
+      grid.get(gk).push(gj);
+    }
+    for (var aj = 0; aj < Y; aj++) {
+      var ax8 = Math.floor((vx[aj] + 1) * 16), ay8 = Math.floor((vy[aj] + 1) * 16), az8 = Math.floor((vz[aj] + 1) * 16);
+      for (var ox2 = -1; ox2 <= 1; ox2++) for (var oy2 = -1; oy2 <= 1; oy2++) for (var oz2 = -1; oz2 <= 1; oz2++) {
+        var cell = grid.get((ax8 + ox2) + (ay8 + oy2) * 64 + (az8 + oz2) * 4096);
+        if (!cell) continue;
+        for (var ci = 0; ci < cell.length; ci++) {
+          var bj = cell[ci];
+          if (bj <= aj) continue;
+          var ddx = vx[aj] - vx[bj], ddy = vy[aj] - vy[bj], ddz = vz[aj] - vz[bj];
+          var dd = Math.sqrt(ddx * ddx + ddy * ddy + ddz * ddz);
+          if (dd >= 1 / 16) continue;
+          var bk = Math.min(7, Math.floor((1 - dd * 16) * 8));
+          buckets[bk].push(sx[aj], sy[aj], sx[bj], sy[bj]);
+        }
+      }
+    }
+    ctx.strokeStyle = "#1c1c1c";
+    ctx.lineWidth = 1 / 2;
+    for (var bi = 0; bi < 8; bi++) {
+      var pts8 = buckets[bi];
+      if (!pts8.length) continue;
+      var ba = (bi + 1) / 8;
+      ctx.globalAlpha = ba * ba * ba; // nearest opaque, faster falloff
       ctx.beginPath();
-      ctx.arc(q.x, q.y, q.r, 0, Math.PI * 2);
+      for (var pi = 0; pi < pts8.length; pi += 4) {
+        ctx.moveTo(pts8[pi], pts8[pi + 1]);
+        ctx.lineTo(pts8[pi + 2], pts8[pi + 3]);
+      }
+      ctx.stroke();
+    }
+    // Dots. Front solid, back diffused: same size, just fainter,
+    // so it reads as fog behind.
+    for (var dj = 0; dj < Y; dj++) {
+      ctx.globalAlpha = sf[dj] + (1 - sf[dj]) / 8;
+      ctx.beginPath();
+      ctx.arc(sx[dj], sy[dj], 3 / 2, 0, Math.PI * 2); // every dot the same size
       ctx.fill();
     }
     ctx.globalAlpha = 1;
   }
 
-  if (reduceMotion) { // static ring, no loop
-    rot = 0.6;
-    lastPhase = 0;
-    draw(0);
-    return;
+  // Point the attractor at a screen position and feed it energy
+  // proportional to how fast the pointer is moving.
+  var lastMX = null, lastMY = null;
+  function feedAttractor(x, y) {
+    attrTX = (x / W * 2 - 1) * 3 / 4;
+    attrTY = (y / H * 2 - 1) * 3 / 4;
+    if (lastMX !== null) {
+      var moved = Math.sqrt((x - lastMX) * (x - lastMX) + (y - lastMY) * (y - lastMY));
+      energy = Math.min(1, energy + moved / 240);
+    }
+    lastMX = x; lastMY = y;
+    if (reduceMotion) drawStatic();
+  }
+  function drawStatic() {
+    for (var j = 0; j < Y; j++) {
+      vx[j] = DIRS[j * 3] * 3 / 4; vy[j] = DIRS[j * 3 + 1] * 3 / 4; vz[j] = DIRS[j * 3 + 2] * 3 / 4;
+    }
+    draw();
   }
 
-  function inPanel(e) { return e.target && e.target.closest && e.target.closest(".panel"); }
+  // Desktop: moving the mouse deforms the surface near the cursor.
+  // Dragging does the same thing harder — it's the touch fallback.
+  // Drags starting on a button never steer, so navigation stays
+  // fully interactive.
+  var dragging = false, dragMoved = 0, lastPX = 0, lastPY = 0, suppressClick = false;
+  window.addEventListener("pointermove", function (e) {
+    if (dragging || e.pointerType !== "mouse") return;
+    feedAttractor(e.clientX, e.clientY);
+  });
+  var askedOrientation = false;
+  window.addEventListener("pointerdown", function (e) {
+    if (e.target && e.target.closest && e.target.closest(".stark-btn")) return;
+    // Phones: orientation permission needs a user tap (and HTTPS),
+    // but only ask when the tap is on the background — never when
+    // someone is just following a navigation link.
+    if (!askedOrientation) {
+      askedOrientation = true;
+      if (window.DeviceOrientationEvent && typeof window.DeviceOrientationEvent.requestPermission === "function") {
+        window.DeviceOrientationEvent.requestPermission().catch(function () {});
+      }
+    }
+    dragging = true; dragMoved = 0;
+    lastPX = e.clientX; lastPY = e.clientY;
+    feedAttractor(e.clientX, e.clientY);
+  });
+  window.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    dragMoved += Math.abs(e.clientX - lastPX) + Math.abs(e.clientY - lastPY);
+    lastPX = e.clientX; lastPY = e.clientY;
+    feedAttractor(e.clientX, e.clientY);
+  });
+  window.addEventListener("pointerup", function () {
+    if (dragging && dragMoved > 6) suppressClick = true;
+    dragging = false;
+  });
+  window.addEventListener("click", function (e) {
+    if (!suppressClick) return;
+    suppressClick = false;
+    if (e.target && e.target.closest && e.target.closest(".stark-btn")) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
 
-  window.addEventListener("wheel", function (e) {
-    if (inPanel(e)) return; // panel keeps its own scroll
-    e.preventDefault();     // stop Safari trying to scroll a scroll-less page
-    var delta = e.deltaY;
-    if (e.deltaMode === 1) delta *= 16;
-    else if (e.deltaMode === 2) delta *= window.innerHeight;
-    boost += delta * 0.00045;
-    boost = Math.max(-0.1, Math.min(1.5, boost));
-    document.body.classList.add("scrolled");
-  }, { passive: false });
+  // Phone tilt becomes gravity: gamma is sideways, beta (from a
+  // natural 45° hold) is forward/back. Wherever this never fires
+  // (denied, unsupported, desktop), dragging remains the control.
+  window.addEventListener("deviceorientation", function (e) {
+    if (e.gamma === null || e.beta === null) return;
+    var gx = Math.max(-45, Math.min(45, e.gamma)) / 45;
+    var gy = (Math.max(0, Math.min(90, e.beta)) - 45) / 45;
+    var gm = Math.sqrt(gx * gx + gy * gy) || 1;
+    gravX = gx / gm; gravY = gy / gm;
+    gravAmt = Math.min(1, gm);
+    if (reduceMotion) drawStatic();
+  });
 
-  var lastTouchY = null;
-  window.addEventListener("touchstart", function (e) {
-    lastTouchY = e.touches[0] ? e.touches[0].clientY : null;
-  }, { passive: true });
-  window.addEventListener("touchmove", function (e) {
-    if (inPanel(e) || lastTouchY === null) return;
-    e.preventDefault();
-    var y = e.touches[0] ? e.touches[0].clientY : lastTouchY;
-    boost += (lastTouchY - y) * 0.002;
-    boost = Math.max(-0.1, Math.min(1.5, boost));
-    lastTouchY = y;
-    document.body.classList.add("scrolled");
-  }, { passive: false });
+  if (reduceMotion) { drawStatic(); return; }
 
-  var last = null;
   function frame(now) {
-    var dt = last === null ? 16.7 : Math.min(50, now - last);
-    last = now;
-    rot += dt * 0.00035;
-    boost *= Math.pow(0.45, dt / 1000);
-    if (Math.abs(boost) < 0.001) boost = 0;
-
-    stageT += dt / 1000 * (0.11 + boost); // ~9s a shape at idle, faster scrolled
-    while (stageT >= 1) { stageT -= 1; stage = (stage + 1) % SHAPES.length; }
-    while (stageT < 0) { stageT += 1; stage = (stage - 1 + SHAPES.length) % SHAPES.length; }
-    var phase = stageT < 0.62 ? 0 : stageT < 0.8 ? 1 : 2;
-    if (phase !== lastPhase) {
-      lastPhase = phase;
-      if (phase === 0) setTargets("shape", stage);
-      else if (phase === 1) setTargets("scatter", stage);
-      else setTargets("shape", (stage + 1) % SHAPES.length);
-    }
-
-    var f = 1 - Math.exp(-dt * (phase === 1 ? 0.006 : phase === 2 ? 0.009 : 0.0035));
-    for (var j = 0; j < N; j++) {
-      var p = pts[j];
-      p.x += (p.tx - p.x) * f;
-      p.y += (p.ty - p.y) * f;
-      p.z += (p.tz - p.z) * f;
-    }
-    draw(now);
+    var dt = lastFrame === null ? 16 : Math.min(50, now - lastFrame);
+    lastFrame = now;
+    stepElastic(now, dt);
+    draw();
     window.requestAnimationFrame(frame);
   }
   window.requestAnimationFrame(frame);
