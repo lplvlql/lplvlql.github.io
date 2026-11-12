@@ -50,12 +50,7 @@
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-  window.addEventListener("resize", function () {
-    resize();
-    // Resizing clears the canvas; reduced-motion has no loop
-    // to repaint it, so redraw the static frame explicitly.
-    if (reduceMotion) drawStatic();
-  });
+  window.addEventListener("resize", resize); // the loop repaints
   resize();
 
   // Elastic state: each point has an offset from its home position
@@ -63,6 +58,18 @@
   // (idle waves + cursor + gravity), slightly underdamped, so the
   // surface overshoots a little as it settles.
   var OFF = new Float32Array(Y * 3), VEL = new Float32Array(Y * 3);
+  var T0 = 2989; // the animation clock's starting moment
+  (function initElastic() {
+    var sw0 = swellCenters(T0 / 1000), sw1 = swellCenters((T0 + 16.7) / 1000);
+    for (var j = 0; j < Y; j++) {
+      var k = j * 3;
+      var dx = DIRS[k], dy = DIRS[k + 1], dz = DIRS[k + 2];
+      var r0 = radialAt(dx, dy, dz, dx * 3 / 4, dy * 3 / 4, dz * 3 / 4, T0 / 1000, sw0);
+      var r1 = radialAt(dx, dy, dz, dx * 3 / 4, dy * 3 / 4, dz * 3 / 4, (T0 + 16.7) / 1000, sw1);
+      OFF[k] = dx * r0; OFF[k + 1] = dy * r0; OFF[k + 2] = dz * r0;
+      VEL[k] = dx * (r1 - r0); VEL[k + 1] = dy * (r1 - r0); VEL[k + 2] = dz * (r1 - r0);
+    }
+  })();
   var sx = new Float32Array(Y), sy = new Float32Array(Y), sf = new Float32Array(Y);
   var vx = new Float32Array(Y), vy = new Float32Array(Y), vz = new Float32Array(Y);
 
@@ -74,6 +81,43 @@
   // Gravity direction from phone tilt (unit-ish), 0 = none.
   var gravX = 0, gravY = 0, gravAmt = 0;
 
+  // One slow rotation: a full turn every 150 seconds around a
+  // fixed axis tilted 15 degrees from vertical. Never resets,
+  // never reverses. Reduced-motion users never get it.
+  var rotAngle = 0;
+  var AXIS = [Math.sin(Math.PI / 12), Math.cos(Math.PI / 12), 0];
+  function rotateVec(x, y, z, ang) {
+    var c = Math.cos(ang), s = Math.sin(ang);
+    var dot = AXIS[0] * x + AXIS[1] * y + AXIS[2] * z;
+    return [
+      x * c + (AXIS[1] * z - AXIS[2] * y) * s + AXIS[0] * dot * (1 - c),
+      y * c + (AXIS[2] * x - AXIS[0] * z) * s + AXIS[1] * dot * (1 - c),
+      z * c + (AXIS[0] * y - AXIS[1] * x) * s + AXIS[2] * dot * (1 - c)
+    ];
+  }
+
+
+  // The autonomous radial field at a moment: travelling waves plus
+  // the two drifting swells. One definition, used everywhere.
+  function swellCenters(t) {
+    var c1th = t * 0.021, c1ph = 1.1 + 0.7 * Math.sin(t * 0.017);
+    var c2th = 2.5 - t * 0.016, c2ph = 2.0 + 0.6 * Math.sin(t * 0.023 + 4);
+    return {
+      c1: [Math.sin(c1ph) * Math.cos(c1th), Math.cos(c1ph), Math.sin(c1ph) * Math.sin(c1th)],
+      a1: 0.045 * (0.5 + 0.5 * Math.sin(t * 0.09 + 1.7)) * (0.6 + 0.4 * Math.sin(t * 0.031)),
+      c2: [Math.sin(c2ph) * Math.cos(c2th), Math.cos(c2ph), Math.sin(c2ph) * Math.sin(c2th)],
+      a2: -0.035 * (0.5 + 0.5 * Math.sin(t * 0.073 + 0.3))
+    };
+  }
+  function radialAt(dx, dy, dz, hx, hy, hz, t, sw) {
+    var radial = (Math.sin(dx * 2 + t * 0.35) + Math.sin(dy * 2 - t * 0.27) + Math.sin(dz * 2 + t * 0.31)) * 0.012;
+    var s1x = hx - sw.c1[0] * 3 / 4, s1y = hy - sw.c1[1] * 3 / 4, s1z = hz - sw.c1[2] * 3 / 4;
+    radial += sw.a1 * Math.exp(-(s1x * s1x + s1y * s1y + s1z * s1z) / (2 * 0.3025));
+    var s2x = hx - sw.c2[0] * 3 / 4, s2y = hy - sw.c2[1] * 3 / 4, s2z = hz - sw.c2[2] * 3 / 4;
+    radial += sw.a2 * Math.exp(-(s2x * s2x + s2y * s2y + s2z * s2z) / (2 * 0.49));
+    return radial;
+  }
+
   function stepElastic(now, dtMs) {
     var t = now / 1000;
     var step = Math.min(3, dtMs / 16.7);
@@ -83,50 +127,37 @@
     attrX += (attrTX - attrX) * ae;
     attrY += (attrTY - attrY) * ae;
     var attrLen = Math.sqrt(attrX * attrX + attrY * attrY + attrZ * attrZ) || 1;
-    var ax = attrX / attrLen * 3 / 4, ay = attrY / attrLen * 3 / 4, az = attrZ / attrLen * 3 / 4;
-    // Autonomous swells: two broad regions that slowly drift all
-    // over the sphere (front and back alike), swelling and
-    // contracting on incommensurate timescales, so the motion
-    // never settles into a recognizable cycle.
-    var c1th = t * 0.021, c1ph = 1.1 + 0.7 * Math.sin(t * 0.017);
-    var c1 = [Math.sin(c1ph) * Math.cos(c1th), Math.cos(c1ph), Math.sin(c1ph) * Math.sin(c1th)];
-    var a1 = 0.045 * (0.5 + 0.5 * Math.sin(t * 0.09 + 1.7)) * (0.6 + 0.4 * Math.sin(t * 0.031));
-    var c2th = 2.5 - t * 0.016, c2ph = 2.0 + 0.6 * Math.sin(t * 0.023 + 4);
-    var c2 = [Math.sin(c2ph) * Math.cos(c2th), Math.cos(c2ph), Math.sin(c2ph) * Math.sin(c2th)];
-    var a2 = -0.035 * (0.5 + 0.5 * Math.sin(t * 0.073 + 0.3));
+    // The attractor lives in view space; the elastic surface lives
+    // in home space. Inverse-rotate it so the pull lands on the
+    // surface the user actually sees as the object turns.
+    var aHome = rotateVec(attrX / attrLen * 3 / 4, attrY / attrLen * 3 / 4, attrZ / attrLen * 3 / 4, -rotAngle);
+    var ax = aHome[0], ay = aHome[1], az = aHome[2];
+    // Same for gravity: tilt is a view-space direction.
+    var gHome = rotateVec(gravX, gravY, 0, -rotAngle);
+    var sw = swellCenters(t);
     for (var j = 0; j < Y; j++) {
       var k = j * 3;
       var dx = DIRS[k], dy = DIRS[k + 1], dz = DIRS[k + 2];
       var hx = dx * 3 / 4, hy = dy * 3 / 4, hz = dz * 3 / 4;
-      // Idle: slow low-frequency waves travelling across the
-      // surface, radial only — regions expand and contract.
-      var wave = Math.sin(dx * 2 + t * 0.35) + Math.sin(dy * 2 - t * 0.27) + Math.sin(dz * 2 + t * 0.31);
-      var radial = wave * 0.012;
-      // Plus the drifting swells, also radial, front and back.
-      var s1x = hx - c1[0] * 3 / 4, s1y = hy - c1[1] * 3 / 4, s1z = hz - c1[2] * 3 / 4;
-      radial += a1 * Math.exp(-(s1x * s1x + s1y * s1y + s1z * s1z) / (2 * 0.3025));
-      var s2x = hx - c2[0] * 3 / 4, s2y = hy - c2[1] * 3 / 4, s2z = hz - c2[2] * 3 / 4;
-      radial += a2 * Math.exp(-(s2x * s2x + s2y * s2y + s2z * s2z) / (2 * 0.49));
+      var radial = radialAt(dx, dy, dz, hx, hy, hz, t, sw);
       var tx2 = dx * radial, ty2 = dy * radial, tz2 = dz * radial;
       // Cursor: nearby points are pulled toward the attractor,
       // with smooth Gaussian falloff so neighbourhoods move as one.
       // A second, much weaker and broader component reaches the
       // far side, so the back answers subtly instead of sitting
       // still — one continuous surface, depth-dependent response.
-      if (energy > 0.002) {
-        var ddx = hx - ax, ddy = hy - ay, ddz = hz - az;
-        var dd2 = ddx * ddx + ddy * ddy + ddz * ddz;
-        var w = Math.exp(-dd2 / (2 * 0.09)) * energy * 0.45;
-        tx2 += (ax - hx) * w; ty2 += (ay - hy) * w; tz2 += (az - hz) * w;
-        var wf = Math.exp(-dd2 / (2 * 0.5625)) * energy * 0.03;
-        tx2 += (ax / (3 / 4)) * wf; ty2 += (ay / (3 / 4)) * wf; tz2 += (az / (3 / 4)) * wf;
-      }
+      var ddx = hx - ax, ddy = hy - ay, ddz = hz - az;
+      var dd2 = ddx * ddx + ddy * ddy + ddz * ddz;
+      var w = Math.exp(-dd2 / (2 * 0.09)) * energy * 0.45;
+      tx2 += (ax - hx) * w; ty2 += (ay - hy) * w; tz2 += (az - hz) * w;
+      var wf = Math.exp(-dd2 / (2 * 0.5625)) * energy * 0.03;
+      tx2 += (ax / (3 / 4)) * wf; ty2 += (ay / (3 / 4)) * wf; tz2 += (az / (3 / 4)) * wf;
       // Gravity: the whole network sags a little toward tilt.
-      if (gravAmt > 0.02) {
-        var gd = (dx * gravX + dy * gravY) * 0.05 * gravAmt;
-        tx2 += gravX * gd; ty2 += gravY * gd;
-      }
+      var gd = (dx * gHome[0] + dy * gHome[1] + dz * gHome[2]) * 0.05 * gravAmt;
+      tx2 += gHome[0] * gd; ty2 += gHome[1] * gd; tz2 += gHome[2] * gd;
       // Spring toward the target, underdamped: overshoot on settle.
+      // On the very first frame, start at the target — otherwise
+      // the whole surface pops from a perfect sphere on load.
       for (var c = 0; c < 3; c++) {
         var tgt = c === 0 ? tx2 : c === 1 ? ty2 : tz2;
         VEL[k + c] = (VEL[k + c] + (tgt - OFF[k + c]) * 0.02 * step) * Math.pow(0.92, step);
@@ -140,7 +171,16 @@
     var cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2;
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = "#1c1c1c";
+    // Rotate the whole deformed structure, then project. Depth
+    // fading and connections use the rotated positions, so the
+    // surface reads consistently as it turns.
+    var rc = Math.cos(rotAngle), rn = Math.sin(rotAngle);
     for (var j = 0; j < Y; j++) {
+      var px0 = vx[j], py0 = vy[j], pz0 = vz[j];
+      var rdot = AXIS[0] * px0 + AXIS[1] * py0;
+      vx[j] = px0 * rc + AXIS[1] * pz0 * rn + AXIS[0] * rdot * (1 - rc);
+      vy[j] = py0 * rc - AXIS[0] * pz0 * rn + AXIS[1] * rdot * (1 - rc);
+      vz[j] = pz0 * rc + (AXIS[0] * py0 - AXIS[1] * px0) * rn;
       var s = 1 / (1 + vz[j] / 4);
       sx[j] = cx + vx[j] * R * s;
       sy[j] = cy + vy[j] * R * s;
@@ -209,22 +249,17 @@
       energy = Math.min(1, energy + moved / 240);
     }
     lastMX = x; lastMY = y;
-    if (reduceMotion) drawStatic();
   }
-  function drawStatic() {
-    for (var j = 0; j < Y; j++) {
-      vx[j] = DIRS[j * 3] * 3 / 4; vy[j] = DIRS[j * 3 + 1] * 3 / 4; vz[j] = DIRS[j * 3 + 2] * 3 / 4;
-    }
-    draw();
-  }
-
   // Desktop: moving the mouse deforms the surface near the cursor.
   // Dragging does the same thing harder — it's the touch fallback.
   // Drags starting on a button never steer, so navigation stays
   // fully interactive.
   var dragging = false, dragMoved = 0, lastPX = 0, lastPY = 0, suppressClick = false;
   window.addEventListener("pointermove", function (e) {
-    if (dragging || e.pointerType !== "mouse") return;
+    if (dragging) {
+      dragMoved += Math.abs(e.clientX - lastPX) + Math.abs(e.clientY - lastPY);
+      lastPX = e.clientX; lastPY = e.clientY;
+    }
     feedAttractor(e.clientX, e.clientY);
   });
   var askedOrientation = false;
@@ -240,12 +275,6 @@
       }
     }
     dragging = true; dragMoved = 0;
-    lastPX = e.clientX; lastPY = e.clientY;
-    feedAttractor(e.clientX, e.clientY);
-  });
-  window.addEventListener("pointermove", function (e) {
-    if (!dragging) return;
-    dragMoved += Math.abs(e.clientX - lastPX) + Math.abs(e.clientY - lastPY);
     lastPX = e.clientX; lastPY = e.clientY;
     feedAttractor(e.clientX, e.clientY);
   });
@@ -272,15 +301,18 @@
     var gm = Math.sqrt(gx * gx + gy * gy) || 1;
     gravX = gx / gm; gravY = gy / gm;
     gravAmt = Math.min(1, gm);
-    if (reduceMotion) drawStatic();
   });
 
-  if (reduceMotion) { drawStatic(); return; }
-
+  var animNow = T0;
   function frame(now) {
     var dt = lastFrame === null ? 16 : Math.min(50, now - lastFrame);
     lastFrame = now;
-    stepElastic(now, dt);
+    // Reduced motion is simply this delta being zero: the one
+    // clock stops, and every system below stops with it.
+    var adt = reduceMotion ? 0 : dt;
+    animNow += adt;
+    rotAngle = (rotAngle + adt * Math.PI / 75000) % (Math.PI * 2); // one turn per 150s
+    stepElastic(animNow, adt);
     draw();
     window.requestAnimationFrame(frame);
   }
