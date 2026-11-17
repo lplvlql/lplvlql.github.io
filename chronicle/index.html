@@ -5,27 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>chronicle — lplvlql</title>
 <meta name="description" content="CHRONICLE. Tabletop card-game design and playtest workspace — 240 cards, six Regions, printable prototype, deterministic simulator.">
-<style>
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth;scroll-snap-type:y mandatory}
-  body{margin:0;background:#fff;color:#0a0a0a;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;-webkit-font-smoothing:antialiased}
-  a{color:#0a0a0a}
-  :focus-visible{outline:2px solid #0a0a0a;outline-offset:3px}
-  #bg-cards{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-  .page-column{position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(720px,100%);background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);pointer-events:none}
-  main{position:relative;z-index:1}
-  .hero{height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;position:relative}
-  .hero-title{font-weight:700;font-size:clamp(32px,8vw,80px);line-height:1.05;letter-spacing:.06em;text-align:center;margin:0}
-  .scroll-arrow{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);font-size:32px;line-height:1;text-decoration:none;padding:6px 14px;transition:opacity .2s}
-  .scroll-arrow.gone{opacity:0;pointer-events:none}
-  .content{scroll-snap-align:start;min-height:100dvh;display:flex}
-  .content-panel{margin:auto;width:100%;max-width:720px;padding:clamp(48px,8vh,80px) clamp(24px,6vh,40px)}
-  .content .lede{font-family:-apple-system,"Helvetica Neue",Helvetica,sans-serif;font-size:20px;line-height:1.65;margin:0 0 20px}
-  .content .status{font-family:-apple-system,"Helvetica Neue",Helvetica,sans-serif;font-size:16px;color:#777;margin:0 0 20px}
-  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:64px}
-  .gallery img{width:100%;height:auto;display:block;border-radius:8px}
-  @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
-</style>
+<link rel="stylesheet" href="../page.css?v=1">
 </head>
 <body>
 <canvas id="bg-cards" aria-hidden="true"></canvas>
@@ -52,20 +32,7 @@
   </div>
   </section>
 </main>
-<script>
-// Scroll cue: the arrow fades as the page leaves the hero, and clicking it
-// glides down at wheel pace (snap pauses mid-glide, then resumes).
-(function () {
-  var a = document.querySelector(".scroll-arrow");
-  if (!a) return;
-  function f() {
-    var h = window.innerHeight || 1;
-    a.classList.toggle("gone", (window.scrollY || 0) > h * 0.25);
-  }
-  window.addEventListener("scroll", f, { passive: true });
-  f();
-})();
-</script>
+<script src="../page.js"></script>
 <script>
 // Background: cards run on the home sphere's rules, synchronised
 // with it — same dots, same dynamic proximity lines (recomputed

@@ -121,17 +121,17 @@ html.stark-page{scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior
 html.stark-page::-webkit-scrollbar{display:none;width:0;height:0}
 body.stark{background:#ffffff;color:#0a0a0a;overflow:hidden;height:100dvh;overscroll-behavior:none;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 body.stark a{color:#0a0a0a}
-body.stark :focus-visible{outline:2px solid #0a0a0a;outline-offset:3px}
+body.stark :focus-visible{outline:2px solid #0a0a0a;outline-offset:2px}
 body.stark code{background:#e8e8e8;color:#0a0a0a}
 .bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;background:#ffffff}
 .view{position:fixed;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;padding:24px}
 .view[hidden]{display:none}
-.stark-stack{display:flex;flex-direction:column;gap:14px;align-items:stretch}
+.stark-stack{display:flex;flex-direction:column;align-items:stretch}
 .stark-btn{
-  display:block;width:min(340px,80vw);padding:20px 24px;text-align:center;
+  display:block;width:min(320px,80vw);padding:16px 24px;text-align:center;
   font-family:var(--mono);font-size:16px;font-weight:700;letter-spacing:.16em;
   color:#0a0a0a !important;text-decoration:none;
-  background:rgba(255,255,255,.18);border:2px solid #0a0a0a;border-radius:0;
+  background:rgba(255,255,255,.2);border:2px solid #0a0a0a;
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
   user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;
 }
@@ -141,8 +141,8 @@ body.stark{cursor:grab}
 /* ===== Hub gallery: one name, one type label per project ===== */
 .view{flex-direction:column}
 .stark-stack{gap:8px}
-.stark-btn{padding:16px 24px;border-radius:8px}
+.stark-btn{border-radius:8px}
 .stark-name{display:block}
-.stark-row{display:flex;gap:8px;width:min(340px,80vw)}
+.stark-row{display:flex;gap:8px;width:min(320px,80vw)}
 .stark-row .stark-btn{width:auto;flex:1;padding:8px 4px}
 .stark-row .stark-name{font-size:12px}
