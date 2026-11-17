@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>poker poker — lplvlql</title>
 <meta name="description" content="poker poker. One-table Flash Poker — you plus three local bots. Boots straight to the table.">
-<link rel="stylesheet" href="../page.css?v=3">
+<link rel="stylesheet" href="../page.css?v=4">
 </head>
 <body>
 <canvas id="bg-chips" aria-hidden="true"></canvas>
@@ -69,7 +69,9 @@
 
   function resize() {
     var dpr = Math.min(2, window.devicePixelRatio || 1);
-    W = window.innerWidth; H = window.innerHeight;
+    var w = window.innerWidth, h = window.innerHeight;
+    if (W && Math.abs(w - W) < 2 && Math.abs(h - H) < 2) return; // ignore URL-bar wobble
+    W = w; H = h;
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
