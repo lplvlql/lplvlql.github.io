@@ -45,7 +45,9 @@
 
   function resize() {
     var dpr = Math.min(2, window.devicePixelRatio || 1);
-    W = window.innerWidth; H = window.innerHeight;
+    var w = window.innerWidth, h = window.innerHeight;
+    if (W && Math.abs(w - W) < 2 && Math.abs(h - H) < 2) return; // ignore URL-bar wobble
+    W = w; H = h;
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -170,7 +172,7 @@
   function draw() {
     var cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2;
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = "#1c1c1c";
+    ctx.fillStyle = "rgba(28,28,28,.8)";
     // Rotate the whole deformed structure, then project. Depth
     // fading and connections use the rotated positions, so the
     // surface reads consistently as it turns.
@@ -213,7 +215,7 @@
         }
       }
     }
-    ctx.strokeStyle = "#1c1c1c";
+    ctx.strokeStyle = "rgba(28,28,28,.8)";
     ctx.lineWidth = 1 / 2;
     for (var bi = 0; bi < 8; bi++) {
       var pts8 = buckets[bi];

@@ -5,42 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>poker poker — lplvlql</title>
 <meta name="description" content="poker poker. One-table Flash Poker — you plus three local bots. Boots straight to the table.">
-<link rel="stylesheet" href="../page.css?v=4">
+<link rel="stylesheet" href="../page.css?v=7">
 </head>
 <body>
 <canvas id="bg-chips" aria-hidden="true"></canvas>
 <div class="page-column" aria-hidden="true"></div>
 <main>
-  <section class="hero">
-    <h1 class="hero-title">poker<br>poker</h1>
-    <a class="scroll-arrow" href="#content" aria-label="Scroll down">↓</a>
+  <section class="hero" id="top">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" class="on" aria-label="ledger poker"><span>1</span></a><a href="#content" aria-label="info"><span>2</span></a></nav>
+    <h1 class="hero-title">ledger<br>poker</h1>
   </section>
 
   <section class="content" id="content">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="ledger poker"><span>1</span></a><a href="#content" class="on" aria-label="info"><span>2</span></a></nav>
   <div class="content-panel">
-    <p class="lede">One-table Flash Poker: <strong>you plus three local bots on a persistent portrait felt</strong>. Boots straight to the table — no login, no lobbies, no shop. Bust, knock, run it back.</p>
-
-    <h2>How a hand plays</h2>
-    <ul>
-      <li>Four fresh seats every hand, one suit each, dealt into a single shared 52-card deck.</li>
-      <li>Every seat antes 1. No blinds. Simultaneous concealed opens, then call or fold.</li>
-      <li>Staged chips stay reversible until the knock seals them. A card flick folds.</li>
-      <li>Board cards can rewrite the rankings mid-hand — a flush suddenly outranking a full house applies to everyone at once.</li>
-      <li>Best five of seven takes the pot. Broke seats get a bust chip and walk back in all-in.</li>
-    </ul>
-
-    <h2>The table</h2>
-    <p>Burgundy felt, blackened metal, brass. Monochrome cards, pixel opponents, a bell, a deck lift, and a knock pad. Phone-first, portrait, one screen.</p>
-
-    <h2>Play it</h2>
-    <p>The game runs as a desktop app and a release CLI, both built from source. No download yet — this page is the table's front door until there's something to hand you.</p>
-
-    <h2>Status</h2>
-    <p>In development. The rules fit on one page; the felt already boots straight to the table. Next: a playable hand right here.</p>
+    <p class="lede">A multiplayer poker game played over the Ledger network, with hand rankings that can change during play.</p>
+    <p class="status">In development.</p>
   </div>
   </section>
 </main>
-<script src="../engine.js"></script>
+<script src="../engine.js?v=1"></script>
 <script>
 // Background: poker chips — geometry only, the engine is shared.
 startBackground("bg-chips", function (pts, rng, W, H) {
@@ -85,6 +69,6 @@ startBackground("bg-chips", function (pts, rng, W, H) {
 </script>
 
 
-<script src="../page.js"></script>
+<script src="../page.js?v=2"></script>
 </body>
 </html>

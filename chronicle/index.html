@@ -5,18 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>chronicle — lplvlql</title>
 <meta name="description" content="chronicle. A card game about living beings slowly being replaced by inanimate copies.">
-<link rel="stylesheet" href="../page.css?v=4">
+<link rel="stylesheet" href="../page.css?v=7">
 </head>
 <body>
 <canvas id="bg-cards" aria-hidden="true"></canvas>
 <div class="page-column" aria-hidden="true"></div>
 <main>
-  <section class="hero">
+  <section class="hero" id="top">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" class="on" aria-label="chronicle"><span>1</span></a><a href="#content" aria-label="gallery"><span>2</span></a></nav>
     <h1 class="hero-title">chronicle</h1>
-    <a class="scroll-arrow" href="#content" aria-label="Scroll down">↓</a>
   </section>
 
   <section class="content" id="content">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="chronicle"><span>1</span></a><a href="#content" class="on" aria-label="gallery"><span>2</span></a></nav>
   <div class="content-panel">
     <p class="lede">A card game about living beings slowly being replaced by inanimate copies.</p>
     <p class="status">In development.</p>
@@ -32,8 +33,8 @@
   </div>
   </section>
 </main>
-<script src="../page.js"></script>
-<script src="../engine.js"></script>
+<script src="../page.js?v=2"></script>
+<script src="../engine.js?v=1"></script>
 <script>
 // Background: dotted cards — geometry only, the engine is shared.
 startBackground("bg-cards", function (pts, rng, W, H) {

@@ -93,8 +93,8 @@ function startBackground(canvasId, build, place, maxz) {
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = "#1c1c1c";
-    ctx.strokeStyle = "#1c1c1c";
+    ctx.fillStyle = "rgba(28,28,28,.8)";
+    ctx.strokeStyle = "rgba(28,28,28,.8)";
     ctx.lineWidth = 0.5;
     // Lines are dynamic, as home: dots within range of each other
     // right now get a line, found through a spatial grid, bucketed

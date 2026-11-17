@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>parcel pocket — lplvlql</title>
+<meta name="description" content="parcel pocket. A mobile companion to Parcel for sharing files directly between devices, built on Ledger.">
+<link rel="stylesheet" href="../page.css?v=7">
+</head>
+<body>
+<canvas id="bg-pocket" aria-hidden="true"></canvas>
+<div class="page-column" aria-hidden="true"></div>
+<main>
+  <section class="hero" id="top">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" class="on" aria-label="ledger pocket"><span>1</span></a><a href="#content" aria-label="info"><span>2</span></a></nav>
+    <h1 class="hero-title">ledger<br>pocket</h1>
+  </section>
+
+  <section class="content" id="content">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="ledger pocket"><span>1</span></a><a href="#content" class="on" aria-label="info"><span>2</span></a></nav>
+  <div class="content-panel">
+    <p class="lede">A mobile companion to Parcel for sharing files directly between devices, built on Ledger.</p>
+    <p class="status">Planned.</p>
+  </div>
+  </section>
+</main>
+<script src="../engine.js?v=1"></script>
+<script>
+// Background: pocket parcels — geometry only, the engine is shared.
+startBackground("bg-pocket", function (pts, rng, W, H) {
+
+  // Pocket parcels as dot homes: small cubes with dots across all
+  // six faces. Same recipe as the cards, pocket-sized.
+  var CB = 28, G = 6, i, j, a, b;
+  for (i = 0; i < G; i++) for (j = 0; j < G; j++) {
+    a = -CB + (i + 0.5) * 2 * CB / G + (rng() - 0.5) * 2;
+    b = -CB + (j + 0.5) * 2 * CB / G + (rng() - 0.5) * 2;
+    pts.push([CB, a, b]); pts.push([-CB, a, b]);
+    pts.push([a, CB, b]); pts.push([a, -CB, b]);
+    pts.push([a, b, CB]); pts.push([a, b, -CB]);
+  }
+}
+, function (W, H) {
+  // Random but well distributed: a 3x3 grid, one pocket parcel per
+  // shuffled cell at a random spot inside it, with fully random
+  // rotations and spin on every load. They stay where they
+  // start: rotation and interaction only, no travelling.
+  var cells = [];
+  for (var gy = 0; gy < 3; gy++) for (var gx = 0; gx < 3; gx++) cells.push([gx, gy]);
+  for (var ci = cells.length - 1; ci > 0; ci--) {
+    var cj = Math.floor(Math.random() * (ci + 1));
+    var tmp = cells[ci]; cells[ci] = cells[cj]; cells[cj] = tmp;
+  }
+  var cards = [];
+  for (var i = 0; i < 9; i++) {
+    cards.push({
+      x: (cells[i][0] + 0.2 + Math.random() * 0.6) / 3,
+      y: (cells[i][1] + 0.2 + Math.random() * 0.6) / 3,
+      rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2,
+      sx: (Math.random() - 0.5) * 0.25, sy: (Math.random() - 0.5) * 0.2, sz: (Math.random() - 0.5) * 0.15
+    });
+  }
+  return cards;
+}
+, 64);
+</script>
+
+<script src="../page.js?v=2"></script>
+</body>
+</html>

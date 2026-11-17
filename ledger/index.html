@@ -4,100 +4,73 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ledger — lplvlql</title>
-<meta name="description" content="ledger. A protocol for sharing files directly between machines, addressed by content.">
-<link rel="stylesheet" href="../page.css?v=4">
+<meta name="description" content="ledger. A protocol for sharing files directly between computers. Files are identified by their contents rather than their location.">
+<link rel="stylesheet" href="../page.css?v=7">
 </head>
 <body>
 <canvas id="bg-peers" aria-hidden="true"></canvas>
 <div class="page-column" aria-hidden="true"></div>
 <main>
-  <section class="hero">
+  <section class="hero" id="top">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" class="on" aria-label="ledger"><span>1</span></a><a href="#content" aria-label="info"><span>2</span></a></nav>
     <h1 class="hero-title">ledger</h1>
-    <a class="scroll-arrow" href="#content" aria-label="Scroll down">↓</a>
   </section>
 
   <section class="content" id="content">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="ledger"><span>1</span></a><a href="#content" class="on" aria-label="info"><span>2</span></a></nav>
   <div class="content-panel">
-    <p class="lede">A protocol for sharing files directly between machines. Files are addressed by content, not location.</p>
+    <p class="lede">A protocol for sharing files directly between computers. Files are identified by their contents rather than their location.</p>
     <p class="status">In development.</p>
-
-    <h2>The core</h2>
-    <p>The reference core is a portable Go binary. Peers share bytes by CID over HTTP today; addressing and local state stay transport-neutral, so the protocol outlives any one transport.</p>
-    <p><a href="https://github.com/lplvlql/cli-ledger">github.com/lplvlql/cli-ledger →</a></p>
-
-    <h2>Hosting note</h2>
-    <p>This hub currently lives on GitHub Pages. The plan is to host it on Ledger itself later — the site is plain static files with relative links, so it moves without a rebuild.</p>
   </div>
   </section>
 </main>
-<script src="../engine.js"></script>
+<script src="../engine.js?v=1"></script>
 <script>
 // Background: a peer network — geometry only, the engine is shared.
 startBackground("bg-peers", function (pts, rng, W, H) {
 
-  // One peer network as dot homes, in local coords about the
-  // origin: eight peers as small dotted balls on a 3x3 grid with
-  // one cell left empty, each joined to its two nearest peers by
-  // dotted links. Random spots and spin on every load, as home.
-  var cells = [];
-  for (var gy = 0; gy < 3; gy++) for (var gx = 0; gx < 3; gx++) cells.push([gx, gy]);
-  for (var ci = cells.length - 1; ci > 0; ci--) {
-    var cj = Math.floor(Math.random() * (ci + 1));
-    var tmp = cells[ci]; cells[ci] = cells[cj]; cells[cj] = tmp;
+  // One hash ring as dot homes, in local coords about the
+  // origin: sixteen peers as small dotted balls on a circle, each
+  // joined to its two ring neighbours by dotted segments. One
+  // ring around the hero: rotation and interaction only, no
+  // travelling.
+  var NP = 16, RR = Math.min(W, H) * 0.31, PR = 8, PER = 80, SEG = 40;
+  var p, k, th, ph, s, u, A, B;
+  var peers = [];
+  for (p = 0; p < NP; p++) {
+    th = (p / NP) * Math.PI * 2;
+    peers.push([RR * Math.cos(th), RR * Math.sin(th), (rng() - 0.5) * 8]);
   }
-  var NP = 8, peers = [];
-  var R = Math.min(W, H) * 0.05;
-  for (var i = 0; i < NP; i++) {
-    peers.push({
-      x: ((cells[i][0] + 0.2 + Math.random() * 0.6) / 3 - 0.5) * W,
-      y: ((cells[i][1] + 0.2 + Math.random() * 0.6) / 3 - 0.5) * H,
-      z: (Math.random() - 0.5) * 80
-    });
-  }
-  var PER = 80, p, k, th, ph, rr;
   for (p = 0; p < NP; p++) {
     for (k = 0; k < PER; k++) {
-      th = rng() * Math.PI * 2; ph = Math.acos(2 * rng() - 1); rr = R * Math.cbrt(rng());
+      th = rng() * Math.PI * 2; ph = Math.acos(2 * rng() - 1);
       pts.push([
-        peers[p].x + rr * Math.sin(ph) * Math.cos(th),
-        peers[p].y + rr * Math.sin(ph) * Math.sin(th),
-        peers[p].z + rr * Math.cos(ph)
+        peers[p][0] + PR * Math.sin(ph) * Math.cos(th),
+        peers[p][1] + PR * Math.sin(ph) * Math.sin(th),
+        peers[p][2] + PR * Math.cos(ph)
       ]);
     }
   }
-  // Links: each peer joins its two nearest; one dotted segment each.
-  var linked = {};
+  // Segments: each peer joins its two ring neighbours with a
+  // dense, near-straight dotted line the engine links into a chain.
   for (p = 0; p < NP; p++) {
-    var order = [];
-    for (var q = 0; q < NP; q++) if (q !== p) {
-      var dx = peers[p].x - peers[q].x, dy = peers[p].y - peers[q].y;
-      order.push([dx * dx + dy * dy, q]);
-    }
-    order.sort(function (a, b) { return a[0] - b[0]; });
-    for (var m = 0; m < 2; m++) {
-      var ea = Math.min(p, order[m][1]), eb = Math.max(p, order[m][1]);
-      linked[ea + "-" + eb] = [ea, eb];
-    }
-  }
-  var SEG = 36, s, u;
-  for (var key in linked) {
-    var A = peers[linked[key][0]], B = peers[linked[key][1]];
+    A = peers[p]; B = peers[(p + 1) % NP];
     for (s = 0; s <= SEG; s++) {
       u = s / SEG;
       pts.push([
-        A.x + (B.x - A.x) * u + (rng() - 0.5) * 3,
-        A.y + (B.y - A.y) * u + (rng() - 0.5) * 3,
-        A.z + (B.z - A.z) * u + (rng() - 0.5) * 3
+        A[0] + (B[0] - A[0]) * u + (rng() - 0.5),
+        A[1] + (B[1] - A[1]) * u + (rng() - 0.5),
+        A[2] + (B[2] - A[2]) * u + (rng() - 0.5)
       ]);
     }
   }
 }
 , function (W, H) {
-  return [{ x: 0.5, y: 0.5, rx: 0.15, ry: 0, rz: Math.random() * Math.PI * 2, sx: 0, sy: 0, sz: 0.05 }];
+  return [{ x: 0.5, y: 0.5, rx: 0.25, ry: 0.1, rz: Math.random() * Math.PI * 2, sx: 0.02, sy: 0.015, sz: 0.06 }];
 }
-, 160);
+, 224);
 </script>
 
-<script src="../page.js"></script>
+<script src="../page.js?v=2"></script>
 </body>
 </html>

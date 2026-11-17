@@ -4,50 +4,61 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>parcel — lplvlql</title>
-<meta name="description" content="parcel. A desktop file-sharing app built on Ledger. Point it at a folder and serve verified bytes.">
-<link rel="stylesheet" href="../page.css?v=4">
+<meta name="description" content="parcel. A desktop app for sharing files directly between computers, built on Ledger.">
+<link rel="stylesheet" href="../page.css?v=7">
 </head>
 <body>
 <canvas id="bg-parcels" aria-hidden="true"></canvas>
 <div class="page-column" aria-hidden="true"></div>
 <main>
-  <section class="hero">
-    <h1 class="hero-title">parcel</h1>
-    <a class="scroll-arrow" href="#content" aria-label="Scroll down">↓</a>
+  <section class="hero" id="top">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" class="on" aria-label="ledger parcel"><span>1</span></a><a href="#content" aria-label="info"><span>2</span></a></nav>
+    <h1 class="hero-title">ledger<br>parcel</h1>
   </section>
 
   <section class="content" id="content">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="ledger parcel"><span>1</span></a><a href="#content" class="on" aria-label="info"><span>2</span></a></nav>
   <div class="content-panel">
-    <p class="lede">A desktop file-sharing app built on Ledger. Point it at a folder and it serves verified bytes to anyone with the link.</p>
+    <p class="lede">A desktop app for sharing files directly between computers, built on Ledger.</p>
     <p class="status">In development.</p>
-
-    <h2>How it works</h2>
-    <p>Scans a folder, serves it, and joins peers from invites or <code>ledger://</code> links. Everything it fetches is addressed by content, so what arrives is what was asked for. Ships as <code>Parcel.app</code>.</p>
-
-    <h2 id="pocket">Parcel Pocket</h2>
-    <p>The phone companion to Parcel. Same invites, same verified bytes, from your pocket.</p>
-    <p class="status">Planned.</p>
   </div>
   </section>
 </main>
-<script src="../engine.js"></script>
+<script src="../engine.js?v=1"></script>
 <script>
 // Background: parcels — geometry only, the engine is shared.
 startBackground("bg-parcels", function (pts, rng, W, H) {
 
-  // One parcel as dot homes: a cube with dots across all six
-  // faces. No tape, no flaps — just a box.
-  var CB = 42; // cube half-size
-  (function buildBox() {
-    var G = 7, i, j, a, b;
-    for (i = 0; i < G; i++) for (j = 0; j < G; j++) {
-      a = -CB + (i + 0.5) * 2 * CB / G + (rng() - 0.5) * 2;
-      b = -CB + (j + 0.5) * 2 * CB / G + (rng() - 0.5) * 2;
-      pts.push([CB, a, b]); pts.push([-CB, a, b]);
-      pts.push([a, CB, b]); pts.push([a, -CB, b]);
-      pts.push([a, b, CB]); pts.push([a, b, -CB]);
-    }
-  })();
+  // One parcel as dot homes: an open-top box — dotted bottom and
+  // four sides, no top face, with four short flaps angled outward
+  // from the top edges. Reads as a parcel, not a die.
+  var W2 = 42, D2 = 42, H = 48, FL = 32, FA = 0.9, G = 7, GH = 8, GF = 3;
+  var i, j, ac, ht, fc, ft, ox, oz, fj;
+  for (i = 0; i < G; i++) for (j = 0; j < G; j++) { // bottom
+    ac = -W2 + (i + 0.5) * 2 * W2 / G + (rng() - 0.5) * 2;
+    ht = -D2 + (j + 0.5) * 2 * D2 / G + (rng() - 0.5) * 2;
+    pts.push([ac, ht, -H / 2]);
+  }
+  for (i = 0; i < G; i++) for (j = 0; j < GH; j++) { // four sides
+    ac = (i + 0.5) / G * 2 - 1;
+    ht = -H / 2 + (j + 0.5) / GH * H + (rng() - 0.5) * 2;
+    fj = (rng() - 0.5) * 2;
+    pts.push([W2, ac * D2 + fj, ht]);
+    pts.push([-W2, ac * D2 + fj, ht]);
+    pts.push([ac * W2 + fj, D2, ht]);
+    pts.push([ac * W2 + fj, -D2, ht]);
+  }
+  var co = Math.cos(FA), si = Math.sin(FA);
+  for (i = 0; i < G; i++) for (j = 0; j < GF; j++) { // four flaps
+    fc = (i + 0.5) / G * 2 - 1;
+    ft = (j + 0.5) / GF * FL;
+    ox = W2 + ft * si; oz = H / 2 + ft * co;
+    fj = (rng() - 0.5) * 2;
+    pts.push([ox, fc * D2 + fj, oz]);
+    pts.push([-ox, fc * D2 + fj, oz]);
+    pts.push([fc * W2 + fj, ox, oz]);
+    pts.push([fc * W2 + fj, -ox, oz]);
+  }
 }
 , function (W, H) {
   // Random but well distributed: a 3x3 grid, one parcel per
@@ -71,9 +82,9 @@ startBackground("bg-parcels", function (pts, rng, W, H) {
   }
   return cards;
 }
-, 80);
+, 96);
 </script>
 
-<script src="../page.js"></script>
+<script src="../page.js?v=2"></script>
 </body>
 </html>

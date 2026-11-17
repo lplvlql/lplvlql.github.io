@@ -5,50 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>mister tidy — lplvlql</title>
 <meta name="description" content="mister tidy. One script that migrates a standard MiSTer SD-card layout into the simplified layout.">
-<link rel="stylesheet" href="../page.css?v=4">
+<link rel="stylesheet" href="../page.css?v=7">
 </head>
 <body>
 <canvas id="bg-sdcards" aria-hidden="true"></canvas>
 <div class="page-column" aria-hidden="true"></div>
 <main>
-  <section class="hero">
+  <section class="hero" id="top">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" class="on" aria-label="mister tidy"><span>1</span></a><a href="#content" aria-label="info"><span>2</span></a></nav>
     <h1 class="hero-title">mister<br>tidy</h1>
-    <a class="scroll-arrow" href="#content" aria-label="Scroll down">↓</a>
   </section>
 
   <section class="content" id="content">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="mister tidy"><span>1</span></a><a href="#content" class="on" aria-label="info"><span>2</span></a></nav>
   <div class="content-panel">
-    <p class="lede">One script that migrates a standard MiSTer SD-card layout into the simplified layout — keeping only what the allowlists require, and keeping the helpers current on later runs.</p>
+    <p class="lede">A script that simplifies a MiSTer SD card by removing unnecessary files and organizing what's left.</p>
     <p class="status">Available.</p>
-
-    <h2>Facts</h2>
-    <ul>
-      <li><strong>Target:</strong> /media/fat (default)</li>
-      <li><strong>Form:</strong> shell script</li>
-      <li><strong>Repo:</strong> <a href="https://github.com/lplvlql/mister-simp">github.com/lplvlql/mister-simp</a></li>
-    </ul>
-
-    <h2>What it does</h2>
-    <ul>
-      <li>Keeps the required root files and folders; removes everything not on the allowlists.</li>
-      <li>Normalizes folder names to the canonical layout.</li>
-      <li>Installs the persistent helper scripts into scripts/ and keeps them current.</li>
-    </ul>
-    <p>On MiSTer, run mister-simp.sh from scripts/. With no argument it targets /media/fat; pass a target path to run elsewhere. Example before/after trees live in the repo's examples/.</p>
-
-    <h2>Helper scripts</h2>
-    <ul>
-      <li><strong>clean.sh</strong> — prunes and normalizes the layout</li>
-      <li><strong>update.sh</strong> — syncs core files, game data, and helper scripts</li>
-      <li><strong>cache.sh</strong> — builds the random-game cache</li>
-      <li><strong>random.sh</strong> — picks a cached game and launches it</li>
-      <li><strong>last.sh</strong> — reloads the last generated launch file</li>
-      <li><strong>delete.sh</strong> — deletes the selected game and clears the launch file</li>
-    </ul>
+    <p><a href="https://github.com/lplvlql/mister-simp">GitHub</a></p>
   </div>
   </section>
 </main>
-<script src="../engine.js"></script>
+<script src="../engine.js?v=1"></script>
 <script>
 // Background: dotted SD cards — geometry only, the engine is shared.
 startBackground("bg-sdcards", function (pts, rng, W, H) {
@@ -113,6 +90,6 @@ startBackground("bg-sdcards", function (pts, rng, W, H) {
 , Math.sqrt(84 * 84 / 4 + 110 * 110 / 4 + 6 * 6 / 4));
 </script>
 
-<script src="../page.js"></script>
+<script src="../page.js?v=2"></script>
 </body>
 </html>
