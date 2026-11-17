@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ledger — lplvlql</title>
 <meta name="description" content="ledger. A protocol for sharing files directly between computers. Files are identified by their contents rather than their location.">
-<link rel="stylesheet" href="../page.css?v=7">
+<link rel="stylesheet" href="../page.css?v=8">
 </head>
-<body>
+<body class="pager">
 <canvas id="bg-peers" aria-hidden="true"></canvas>
 <div class="page-column" aria-hidden="true"></div>
 <main>
@@ -24,17 +24,19 @@
   </div>
   </section>
 </main>
-<script src="../engine.js?v=1"></script>
+<script src="../engine.js?v=2"></script>
 <script>
 // Background: a peer network — geometry only, the engine is shared.
 startBackground("bg-peers", function (pts, rng, W, H) {
 
   // One hash ring as dot homes, in local coords about the
-  // origin: sixteen peers as small dotted balls on a circle, each
-  // joined to its two ring neighbours by dotted segments. One
-  // ring around the hero: rotation and interaction only, no
-  // travelling.
-  var NP = 16, RR = Math.min(W, H) * 0.31, PR = 8, PER = 80, SEG = 40;
+  // origin: peers as small dotted balls on a circle, each
+  // joined to its two ring neighbours by dotted segments. Peer
+  // count scales with ring circumference. One ring around the
+  // hero: rotation and interaction only, no travelling.
+  var RR = Math.min(W, H) * 0.31;
+  var NP = Math.max(8, Math.min(24, Math.round(2 * Math.PI * RR / 96)));
+  var PR = 8, PER = 80, SEG = 40;
   var p, k, th, ph, s, u, A, B;
   var peers = [];
   for (p = 0; p < NP; p++) {

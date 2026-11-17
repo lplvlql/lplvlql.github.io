@@ -37,3 +37,5 @@ main{position:relative;z-index:1}
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:64px}
 .gallery img{width:100%;height:auto;display:block;border-radius:8px}
 @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
+html:has(>body.pager){scroll-snap-type:y mandatory}
+body.pager main>section{scroll-snap-align:start}

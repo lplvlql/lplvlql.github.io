@@ -2,6 +2,23 @@
 // proximity lines recomputed every frame, cursor attractor with
 // underdamped elastic settle, tilt gravity, reduced-motion clock.
 // Pages supply only geometry: build fills pts, place returns cards.
+// Proportional scatter: object count scales with screen area, one
+// object per shuffled cell so the spread stays even. No fixed grids.
+function scatterCells(W, H, ref, min, max) {
+  "use strict";
+  var n = Math.max(min, Math.min(max, Math.round(ref * W * H / (1280 * 800))));
+  var cols = Math.max(1, Math.round(Math.sqrt(n * W / H)));
+  var rows = Math.ceil(n / cols);
+  var cells = [];
+  for (var gy = 0; gy < rows; gy++) for (var gx = 0; gx < cols; gx++) cells.push([gx, gy]);
+  for (var ci = cells.length - 1; ci > 0; ci--) {
+    var cj = Math.floor(Math.random() * (ci + 1));
+    var tmp = cells[ci]; cells[ci] = cells[cj]; cells[cj] = tmp;
+  }
+  return cells.slice(0, n).map(function (c) {
+    return [(c[0] + 0.2 + Math.random() * 0.6) / cols, (c[1] + 0.2 + Math.random() * 0.6) / rows];
+  });
+}
 function startBackground(canvasId, build, place, maxz) {
   "use strict";
   var canvas = document.getElementById(canvasId);
