@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOMETIMES REMEMBER — lplvlql</title>
-<meta name="description" content="SOMETIMES REMEMBER. Chronicle: tabletop card-game design and playtest workspace — 240 cards, six Regions, printable prototype, deterministic simulator.">
+<title>chronicle — lplvlql</title>
+<meta name="description" content="CHRONICLE. Tabletop card-game design and playtest workspace — 240 cards, six Regions, printable prototype, deterministic simulator.">
 <style>
   *{box-sizing:border-box}
   html{scroll-behavior:smooth;scroll-snap-type:y mandatory}
@@ -12,46 +12,61 @@
   a{color:#0a0a0a}
   :focus-visible{outline:2px solid #0a0a0a;outline-offset:3px}
   #bg-cards{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  .page-column{position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(720px,100%);background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);pointer-events:none}
   main{position:relative;z-index:1}
   .hero{height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;position:relative}
-  .hero-title{border-radius:16px;font-weight:700;font-size:clamp(34px,7.5vw,80px);line-height:1.05;letter-spacing:.06em;text-align:center;margin:0;padding:26px 36px;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  .scroll-arrow{border-radius:16px;position:absolute;left:50%;bottom:22px;transform:translateX(-50%);font-size:30px;line-height:1;text-decoration:none;padding:6px 14px;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  .content{border-radius:16px;scroll-snap-align:start;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);max-width:720px;margin:0 auto;padding:clamp(80px,12vh,120px) clamp(28px,6vw,56px) clamp(110px,15vh,150px)}
-  .content h2{font-size:24px;letter-spacing:.04em;margin:64px 0 16px}
-  .content h2:first-child{margin-top:0}
-  .content p,.content li{font-family:-apple-system,"Helvetica Neue",Helvetica,sans-serif;font-size:17px;line-height:1.75}
-  .content p{margin:0 0 20px}
-  .lede{font-size:20px !important;line-height:1.65 !important}
-  .content ul{margin:0 0 20px;padding-left:22px}
-  .content li{margin-bottom:10px}
+  .hero h1{font-weight:700;font-size:clamp(34px,7.5vw,80px);line-height:1.05;letter-spacing:.06em;text-align:center;margin:0}
+
+  .scroll-arrow{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);font-size:30px;line-height:1;text-decoration:none;padding:6px 14px;transition:opacity .2s}
+  .scroll-arrow.gone{opacity:0;pointer-events:none}
+  .gallery-section{scroll-snap-align:start;min-height:100dvh;display:flex}
+  .gallery-panel{margin:auto;width:100%;max-width:720px;padding:clamp(48px,8vh,80px) clamp(28px,6vw,56px)}
+  .gallery-section .lede{font-family:-apple-system,"Helvetica Neue",Helvetica,sans-serif;font-size:20px;line-height:1.65;margin:0 0 20px}
+  .gallery-section .status{font-family:-apple-system,"Helvetica Neue",Helvetica,sans-serif;font-size:14px;color:#777;margin:0 0 20px}
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:64px}
+  .gallery img{width:100%;height:auto;display:block;border-radius:8px}
+  @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 <canvas id="bg-cards" aria-hidden="true"></canvas>
+<div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero">
-    <h1 class="hero-title">SOMETIMES<br>REMEMBER</h1>
+    <h1>chronicle</h1>
     <a class="scroll-arrow" href="#content" aria-label="Scroll down">↓</a>
   </section>
 
-  <section class="content" id="content">
-    <p class="lede">Home of <strong>Chronicle</strong> — a tabletop card-game design and playtest workspace: 240 canonical cards across six Regions, a printable prototype, and a deterministic simulator for checking card behavior and play outcomes.</p>
+  <section class="gallery-section" id="content">
+  <div class="gallery-panel">
+    <p class="lede">A card game about living beings slowly being replaced by inanimate copies.</p>
+    <p class="status">In development.</p>
 
-    <h2>Facts</h2>
-    <p>240 canonical cards · 6 Regions · print + simulator. The repository gate covers card records, prototype readiness, simulation smoke, and production inputs/outputs.</p>
-
-    <h2>Start here</h2>
-    <ul>
-      <li><strong>Play:</strong> play guide, player aid, and rules reference.</li>
-      <li><strong>Make cards:</strong> card design, families, art direction, and production notes.</li>
-      <li><strong>Build and test:</strong> prototype kit and development docs.</li>
-    </ul>
-    <p>Validate the full set, inspect one card with timing and references, generate art prompts by stage, or build the printable PDF prototype — including an optional white-card playtest kit.</p>
-
-    <h2>Status</h2>
-    <p>Active design workspace. This site is the project's public home; source lives in the local Chronicle workspace.</p>
+    <div class="gallery">
+      <img src="art/FC01.jpg" alt="Sorela, Twin Passage" loading="lazy">
+      <img src="art/PC02.jpg" alt="Cata, Mirrored Measure" loading="lazy">
+      <img src="art/DC01.jpg" alt="Aroa, Breathing Root" loading="lazy">
+      <img src="art/AS04.jpg" alt="Odela, Signal Convergence" loading="lazy">
+      <img src="art/AS02.jpg" alt="Vesha, Scale Keeper" loading="lazy">
+      <img src="art/DS02.jpg" alt="Ruska, Gilled Vessel" loading="lazy">
+    </div>
+  </div>
   </section>
 </main>
+<script>
+// Scroll cue: the arrow fades as the page leaves the hero, and clicking it
+// glides down at wheel pace (snap pauses mid-glide, then resumes).
+(function () {
+  var a = document.querySelector(".scroll-arrow");
+  if (!a) return;
+  function f() {
+    var h = window.innerHeight || 1;
+    a.classList.toggle("gone", (window.scrollY || 0) > h * 0.25);
+  }
+  window.addEventListener("scroll", f, { passive: true });
+  f();
+})();
+</script>
 <script>
 // Background: cards run on the home sphere's rules, synchronised
 // with it — same dots, same dynamic proximity lines (recomputed
@@ -106,7 +121,8 @@
 
   // Random but well distributed: the screen is a 4x4 grid, one
   // card per shuffled cell at a random spot inside it, with fully
-  // random rotations, spin and drift on every load.
+  // random rotations and spin on every load. They stay where
+  // they start: rotation and interaction only, no travelling.
   var cells = [];
   for (var gy = 0; gy < 4; gy++) for (var gx = 0; gx < 4; gx++) cells.push([gx, gy]);
   for (var ci = cells.length - 1; ci > 0; ci--) {
@@ -120,8 +136,6 @@
       y: (cells[i][1] + 0.2 + Math.random() * 0.6) / 4,
       rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2,
       sx: (Math.random() - 0.5) * 0.25, sy: (Math.random() - 0.5) * 0.2, sz: (Math.random() - 0.5) * 0.15,
-      vx: (Math.random() - 0.5) * 0.00006, vy: (Math.random() - 0.5) * 0.000045,
-      bob: Math.random() * 6.28
     });
   }
 
@@ -139,7 +153,7 @@
   function project(t) {
     var n = 0;
     cards.forEach(function (c) {
-      var cxp = c.x * W, cyp = c.y * H + Math.sin(t / 2600 + c.bob) * 9;
+      var cxp = c.x * W, cyp = c.y * H;
       var ax = c.rx + t / 1000 * c.sx, ay = c.ry + t / 1000 * c.sy, az = c.rz + t / 1000 * c.sz;
       var cax = Math.cos(ax), sax = Math.sin(ax), cay = Math.cos(ay), say = Math.sin(ay), caz = Math.cos(az), saz = Math.sin(az);
       for (var i = 0; i < pts.length; i++, n++) {
@@ -270,14 +284,6 @@
     lastFrame = now;
     var adt = reduceMotion ? 0 : dt; // reduced motion is this delta being zero
     animNow += adt;
-    if (!reduceMotion) {
-      var step = Math.min(3, adt / 16.7);
-      cards.forEach(function (c) {
-        c.x += c.vx * step; c.y += c.vy * step;
-        if (c.x < -0.08) c.x = 1.08; if (c.x > 1.08) c.x = -0.08;
-        if (c.y < -0.1) c.y = 1.1; if (c.y > 1.1) c.y = -0.1;
-      });
-    }
     project(animNow);
     stepElastic(adt);
     draw();

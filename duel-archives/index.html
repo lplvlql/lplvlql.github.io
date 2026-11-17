@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DUEL ARCHIVES — lplvlql</title>
-<meta name="description" content="DUEL ARCHIVES. A project to decompile and improve the five Yu-Gi-Oh! GBA simulators released between 2002 and 2006.">
+<title>duel archives — lplvlql</title>
+<meta name="description" content="duel archives. Turn the five Yu-Gi-Oh! GBA games (2002-2006) into battle simulators.">
 <style>
   *{box-sizing:border-box}
   html{scroll-behavior:smooth;scroll-snap-type:y mandatory}
@@ -12,11 +12,14 @@
   a{color:#0a0a0a}
   :focus-visible{outline:2px solid #0a0a0a;outline-offset:3px}
   #bg-pyramids{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  .page-column{position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(720px,100%);background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);pointer-events:none}
   main{position:relative;z-index:1}
   .hero{height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;position:relative}
-  .hero-title{border-radius:16px;font-weight:700;font-size:clamp(34px,7.5vw,80px);line-height:1.05;letter-spacing:.06em;text-align:center;margin:0;padding:26px 36px;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  .scroll-arrow{border-radius:16px;position:absolute;left:50%;bottom:22px;transform:translateX(-50%);font-size:30px;line-height:1;text-decoration:none;padding:6px 14px;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  .content{border-radius:16px;scroll-snap-align:start;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);max-width:720px;margin:0 auto;padding:clamp(80px,12vh,120px) clamp(28px,6vw,56px) clamp(110px,15vh,150px)}
+  .hero-title{font-weight:700;font-size:clamp(34px,7.5vw,80px);line-height:1.05;letter-spacing:.06em;text-align:center;margin:0}
+  .scroll-arrow{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);font-size:30px;line-height:1;text-decoration:none;padding:6px 14px;transition:opacity .2s}
+  .scroll-arrow.gone{opacity:0;pointer-events:none}
+  .content{scroll-snap-align:start;min-height:100dvh;display:flex}
+  .content-panel{margin:auto;width:100%;max-width:720px;padding:clamp(48px,8vh,80px) clamp(28px,6vw,56px)}
   .content h2{font-size:24px;letter-spacing:.04em;margin:64px 0 16px}
   .content h2:first-child{margin-top:0}
   .content p,.content li{font-family:-apple-system,"Helvetica Neue",Helvetica,sans-serif;font-size:17px;line-height:1.75}
@@ -28,42 +31,34 @@
 </head>
 <body>
 <canvas id="bg-pyramids" aria-hidden="true"></canvas>
+<div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero">
-    <h1 class="hero-title">DUEL<br>ARCHIVES</h1>
+    <h1 class="hero-title">duel<br>archives</h1>
     <a class="scroll-arrow" href="#content" aria-label="Scroll down">↓</a>
   </section>
 
   <section class="content" id="content">
-    <p class="lede">A project to <strong>decompile and improve the five Yu-Gi-Oh! GBA simulators released between 2002 and 2006</strong> — one game for each year, with better AI, more interesting decks, and fixes to the original games, while keeping each year's card pool and mechanics intact.</p>
+  <div class="content-panel">
+    <p class="lede">A project to turn the five Yu-Gi-Oh! GBA games released between 2002 and 2006 into battle simulators, with curated card pools, stronger opponent decks, and improved AI.</p>
+
 
     <h2>2002 — The Eternal Duelist Soul</h2>
-    <ul>
-      <li>Builds on an existing decompilation.</li>
-    </ul>
+    <p>Improvements in progress.</p>
 
     <h2>2003 — Worldwide Edition: Stairway to the Destined Duel</h2>
-    <ul>
-      <li>Currently being decompiled.</li>
-    </ul>
+    <p>Decompilation in progress.</p>
 
     <h2>2004 — World Championship Tournament 2004</h2>
-    <ul>
-      <li>Planned.</li>
-    </ul>
+    <p>Planned.</p>
 
     <h2>2005 — 7 Trials to Glory: World Championship Tournament 2005</h2>
-    <ul>
-      <li>Planned.</li>
-    </ul>
+    <p>Planned.</p>
 
     <h2>2006 — Ultimate Masters: World Championship Tournament 2006</h2>
-    <ul>
-      <li>Planned.</li>
-    </ul>
-
-    <h2>Approach</h2>
-    <p>Each year's game stays itself: same card pool, same mechanics. The work is under the hood — an AI that puts up a fight, decks worth dueling against, and the original bugs fixed.</p>
+    <p>Planned.</p>
+  </div>
+  </section>
 </main>
 <script>
 // Background: pyramids run on the home sphere's rules, synchronised
@@ -102,14 +97,14 @@
   window.addEventListener("resize", resize); // the loop repaints, as home
   resize();
 
-  // One Millennium-Puzzle-style pyramid as dot homes: four
-  // triangular faces and a square base, with the Eye drawn in
-  // dots on the front face, slightly raised off its surface.
+  // One simple pyramid as dot homes: a square pyramid with
+  // dots across its 4 triangular faces plus the square base.
+  // No eye, no nested outlines, no loop — just a pyramid.
   var pts = [];
   (function buildPyramid() {
-    var A = [0, -58, 0]; // apex
-    var B = [[-56, 38, 56], [56, 38, 56], [56, 38, -56], [-56, 38, -56]]; // base corners
-    var steps = 11, i, j;
+    var A = [0, -60, 0]; // apex at the bottom (point-down)
+    var B = [[-55, 40, 55], [55, 40, 55], [55, 40, -55], [-55, 40, -55]];
+    var steps = 10, i, j;
     function onFace(p, q, r) {
       for (i = 0; i <= steps; i++) for (j = 0; j <= steps - i; j++) {
         var u = i / steps, v = j / steps;
@@ -121,28 +116,9 @@
       }
     }
     for (var f = 0; f < 4; f++) onFace(A, B[f], B[(f + 1) % 4]);
-    var nx = 7, nz = 7;
+    var nx = 6, nz = 6;
     for (i = 0; i < nx; i++) for (j = 0; j < nz; j++) {
-      pts.push([-56 + (i + 0.5) * 112 / nx, 38, -56 + (j + 0.5) * 112 / nz]);
-    }
-    // The Eye on the front face: an almond outline and iris ring,
-    // placed in that face's plane and lifted 2 units along its
-    // outward normal so it sits on the surface.
-    var C = [0, -14, 25], right = [1, 0, 0], up = [0, 0.857, 0.515], nrm = [0, -0.515, 0.857];
-    function eyeDot(sx, sy) {
-      pts.push([
-        C[0] + right[0] * sx + up[0] * sy + nrm[0] * 2,
-        C[1] + right[1] * sx + up[1] * sy + nrm[1] * 2,
-        C[2] + right[2] * sx + up[2] * sy + nrm[2] * 2
-      ]);
-    }
-    for (var k = 0; k < 28; k++) {
-      var th = k / 28 * Math.PI * 2;
-      eyeDot(Math.cos(th) * 24, Math.sin(th) * 9 * (1 - Math.abs(Math.cos(th)) * 0.25));
-    }
-    for (var k2 = 0; k2 < 14; k2++) {
-      var th2 = k2 / 14 * Math.PI * 2;
-      eyeDot(Math.cos(th2) * 7.5, Math.sin(th2) * 7.5);
+      pts.push([-55 + (i + 0.5) * 110 / nx, 40, -55 + (j + 0.5) * 110 / nz]);
     }
   })();
 
@@ -155,15 +131,15 @@
     var cj = Math.floor(Math.random() * (ci + 1));
     var tmp = cells[ci]; cells[ci] = cells[cj]; cells[cj] = tmp;
   }
+  // Point-down pyramids yawing about the vertical. Positions
+  // stay where they start: rotation and interaction only.
   var cards = [];
   for (var i = 0; i < 9; i++) {
     cards.push({
       x: (cells[i][0] + 0.2 + Math.random() * 0.6) / 3,
       y: (cells[i][1] + 0.2 + Math.random() * 0.6) / 3,
-      rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2,
-      sx: (Math.random() - 0.5) * 0.22, sy: (Math.random() - 0.5) * 0.18, sz: (Math.random() - 0.5) * 0.14,
-      vx: (Math.random() - 0.5) * 0.00005, vy: (Math.random() - 0.5) * 0.00004,
-      bob: Math.random() * 6.28
+      rx: Math.PI + (Math.random() - 0.5) * 0.3, ry: Math.random() * Math.PI * 2, rz: (Math.random() - 0.5) * 0.3,
+      sx: 0, sy: (Math.random() - 0.5) * 0.18, sz: 0
     });
   }
 
@@ -172,7 +148,7 @@
   var px = new Float32Array(N), py = new Float32Array(N); // homes + elastic offset
   var sf = new Float32Array(N);
   var OFF = new Float32Array(N * 2), VEL = new Float32Array(N * 2);
-  var MAXZ = 84; // farthest dot from the pyramid centre
+  var MAXZ = 90; // farthest dot from the small pyramid centre
 
   // Cursor attractor and its energy — the home page's numbers.
   var attrX = 0, attrY = 0, attrTX = 0, attrTY = 0, energy = 0;
@@ -181,7 +157,7 @@
   function project(t) {
     var n = 0;
     cards.forEach(function (c) {
-      var cxp = c.x * W, cyp = c.y * H + Math.sin(t / 2600 + c.bob) * 9;
+      var cxp = c.x * W, cyp = c.y * H;
       var ax = c.rx + t / 1000 * c.sx, ay = c.ry + t / 1000 * c.sy, az = c.rz + t / 1000 * c.sz;
       var cax = Math.cos(ax), sax = Math.sin(ax), cay = Math.cos(ay), say = Math.sin(ay), caz = Math.cos(az), saz = Math.sin(az);
       for (var i = 0; i < pts.length; i++, n++) {
@@ -228,8 +204,8 @@
     // Lines are dynamic, as home: dots within range of each other
     // right now get a line, found through a spatial grid, bucketed
     // by opacity so each bucket is a single stroke.
-    // Cutoff just past the dot spacing (~11.5px here; the sphere's
-    // 1/16 is likewise ~1.3x its spacing) — not a neighbour count.
+    // Cutoff ~2x the along-edge dot spacing, so edges read
+    // solid — not a neighbour count.
     var DIST = 16, CELL = DIST;
     var buckets = [[], [], [], [], [], [], [], []];
     var grid = new Map();
@@ -312,20 +288,26 @@
     lastFrame = now;
     var adt = reduceMotion ? 0 : dt; // reduced motion is this delta being zero
     animNow += adt;
-    if (!reduceMotion) {
-      var step = Math.min(3, adt / 16.7);
-      cards.forEach(function (c) {
-        c.x += c.vx * step; c.y += c.vy * step;
-        if (c.x < -0.08) c.x = 1.08; if (c.x > 1.08) c.x = -0.08;
-        if (c.y < -0.1) c.y = 1.1; if (c.y > 1.1) c.y = -0.1;
-      });
-    }
     project(animNow);
     stepElastic(adt);
     draw();
     window.requestAnimationFrame(frame);
   }
   window.requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+// Scroll cue: the arrow fades as the page leaves the hero.
+(function () {
+  var a = document.querySelector(".scroll-arrow");
+  if (!a) return;
+  function g() {
+    var h = window.innerHeight || 1;
+    a.classList.toggle("gone", (window.scrollY || 0) > h * 0.25);
+  }
+  window.addEventListener("scroll", g, { passive: true });
+  g();
 })();
 </script>
 </body>
