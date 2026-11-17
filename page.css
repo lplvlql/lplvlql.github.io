@@ -1,4 +1,4 @@
-/* Shared subpage styles: chronicle, duel archives (and future pages).
+/* Shared subpage styles: chronicle, duel archives, ledger, parcel, poker, mister tidy.
    One source of truth — text scale, spacing, hero, blur column.
    Numbers snap to one scale: 1 / 1.6 / 2 / 4 / 6 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 / 64 / 80. */
 *{box-sizing:border-box}
