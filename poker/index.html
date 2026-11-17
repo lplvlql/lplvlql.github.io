@@ -3,38 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>POKER POKER — lplvlql</title>
-<meta name="description" content="POKER POKER. One-table Flash Poker — 240 cards, six Regions, printable prototype, deterministic simulator.">
-<style>
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth;scroll-snap-type:y mandatory}
-  body{margin:0;background:#fff;color:#0a0a0a;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;-webkit-font-smoothing:antialiased}
-  a{color:#0a0a0a}
-  :focus-visible{outline:2px solid #0a0a0a;outline-offset:3px}
-  #bg-cards{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-  main{position:relative;z-index:1}
-  .hero{height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;position:relative}
-  .hero-title{border-radius:16px;font-weight:700;font-size:clamp(34px,7.5vw,80px);line-height:1.05;letter-spacing:.06em;text-align:center;margin:0;padding:26px 36px;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  .scroll-arrow{border-radius:16px;position:absolute;left:50%;bottom:22px;transform:translateX(-50%);font-size:30px;line-height:1;text-decoration:none;padding:6px 14px;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  .content{border-radius:16px;scroll-snap-align:start;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);max-width:720px;margin:0 auto;padding:clamp(80px,12vh,120px) clamp(28px,6vw,56px) clamp(110px,15vh,150px)}
-  .content h2{font-size:24px;letter-spacing:.04em;margin:64px 0 16px}
-  .content h2:first-child{margin-top:0}
-  .content p,.content li{font-family:-apple-system,"Helvetica Neue",Helvetica,sans-serif;font-size:17px;line-height:1.75}
-  .content p{margin:0 0 20px}
-  .lede{font-size:20px !important;line-height:1.65 !important}
-  .content ul{margin:0 0 20px;padding-left:22px}
-  .content li{margin-bottom:10px}
-</style>
+<title>poker poker — lplvlql</title>
+<meta name="description" content="poker poker. One-table Flash Poker — you plus three local bots. Boots straight to the table.">
+<link rel="stylesheet" href="../page.css?v=2">
 </head>
 <body>
-<canvas id="bg-cards" aria-hidden="true"></canvas>
+<canvas id="bg-chips" aria-hidden="true"></canvas>
+<div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero">
-    <h1 class="hero-title">POKER<br>POKER</h1>
+    <h1 class="hero-title">poker<br>poker</h1>
     <a class="scroll-arrow" href="#content" aria-label="Scroll down">↓</a>
   </section>
 
   <section class="content" id="content">
+  <div class="content-panel">
     <p class="lede">One-table Flash Poker: <strong>you plus three local bots on a persistent portrait felt</strong>. Boots straight to the table — no login, no lobbies, no shop. Bust, knock, run it back.</p>
 
     <h2>How a hand plays</h2>
@@ -54,9 +37,11 @@
 
     <h2>Status</h2>
     <p>In development. The rules fit on one page; the felt already boots straight to the table. Next: a playable hand right here.</p>
+  </div>
+  </section>
 </main>
 <script>
-// Background: cards run on the home sphere's rules, synchronised
+// Background: poker chips run on the home sphere's rules, synchronised
 // with it — same dots, same dynamic proximity lines (recomputed
 // every frame from where dots are right now, bucketed by distance,
 // nearer = more opaque with cubic falloff), same cursor attractor
@@ -64,7 +49,7 @@
 // reduced-motion clock. Only the homes differ: flat cards, not a sphere.
 (function () {
   "use strict";
-  var canvas = document.getElementById("bg-cards");
+  var canvas = document.getElementById("bg-chips");
   if (!canvas || !canvas.getContext) return;
   var ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -92,23 +77,29 @@
   window.addEventListener("resize", resize); // the loop repaints, as home
   resize();
 
-  // One card's dots: evenly spread over its face with jitter
-  // (the sphere's recipe, flattened). No precomputed links —
+  // One poker chip: dots on concentric rings with jitter,
+  // a denser dot for the centre spot. No precomputed links —
   // lines are dynamic, exactly as on the home page.
-  var CW = 92, CH = 138;
+  var CR = 38;
   var pts = [];
-  (function buildCard() {
-    var nx = 8, ny = 12, i, j;
-    for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) {
-      pts.push([
-        -CW / 2 + (i + 0.5) * CW / nx + (rng() - 0.5) * 5,
-        -CH / 2 + (j + 0.5) * CH / ny + (rng() - 0.5) * 5
-      ]);
+  (function buildChip() {
+    var ring, k, nn, a, rr;
+    for (ring = 0; ring <= 5; ring++) {
+      rr = CR * ring / 5;
+      nn = ring === 0 ? 1 : ring * 8;
+      for (k = 0; k < nn; k++) {
+        a = k / nn * Math.PI * 2;
+        pts.push([
+          Math.cos(a) * rr + (rng() - 0.5) * 4,
+          Math.sin(a) * rr + (rng() - 0.5) * 4,
+          (rng() - 0.5) * 3
+        ]);
+      }
     }
   })();
 
   // Random but well distributed: the screen is a 4x4 grid, one
-  // card per shuffled cell at a random spot inside it, with fully
+  // chip per shuffled cell at a random spot inside it, with fully
   // random rotations and spin on every load. They stay where
   // they start: rotation and interaction only, no travelling.
   var cells = [];
@@ -132,7 +123,7 @@
   var px = new Float32Array(N), py = new Float32Array(N); // homes + elastic offset
   var sf = new Float32Array(N);
   var OFF = new Float32Array(N * 2), VEL = new Float32Array(N * 2);
-  var MAXZ = Math.sqrt(CW * CW / 4 + CH * CH / 4);
+  var MAXZ = CR; // farthest dot from the thin chip centre
 
   // Cursor attractor and its energy — the home page's numbers.
   var attrX = 0, attrY = 0, attrTX = 0, attrTY = 0, energy = 0;
@@ -280,5 +271,7 @@
   window.requestAnimationFrame(frame);
 })();
 </script>
+
+<script src="../page.js"></script>
 </body>
 </html>

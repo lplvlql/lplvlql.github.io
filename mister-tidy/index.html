@@ -3,39 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MISTER TIDY — lplvlql</title>
-<meta name="description" content="CHRONICLE. Tabletop card-game design and playtest workspace — 240 cards, six Regions, printable prototype, deterministic simulator.">
-<style>
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth;scroll-snap-type:y mandatory}
-  body{margin:0;background:#fff;color:#0a0a0a;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;-webkit-font-smoothing:antialiased}
-  a{color:#0a0a0a}
-  :focus-visible{outline:2px solid #0a0a0a;outline-offset:3px}
-  #bg-sdcards{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-  main{position:relative;z-index:1}
-  .hero{height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;position:relative}
-  .hero-title{border-radius:16px;font-weight:700;font-size:clamp(34px,7.5vw,80px);line-height:1.05;letter-spacing:.06em;text-align:center;margin:0;padding:26px 36px;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  .scroll-arrow{border-radius:16px;position:absolute;left:50%;bottom:22px;transform:translateX(-50%);font-size:30px;line-height:1;text-decoration:none;padding:6px 14px;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  .content{border-radius:16px;scroll-snap-align:start;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);max-width:720px;margin:0 auto;padding:clamp(80px,12vh,120px) clamp(28px,6vw,56px) clamp(110px,15vh,150px)}
-  .content h2{font-size:24px;letter-spacing:.04em;margin:64px 0 16px}
-  .content h2:first-child{margin-top:0}
-  .content p,.content li{font-family:-apple-system,"Helvetica Neue",Helvetica,sans-serif;font-size:17px;line-height:1.75}
-  .content p{margin:0 0 20px}
-  .lede{font-size:20px !important;line-height:1.65 !important}
-  .content ul{margin:0 0 20px;padding-left:22px}
-  .content li{margin-bottom:10px}
-</style>
+<title>mister tidy — lplvlql</title>
+<meta name="description" content="mister tidy. One script that migrates a standard MiSTer SD-card layout into the simplified layout.">
+<link rel="stylesheet" href="../page.css?v=2">
 </head>
 <body>
 <canvas id="bg-sdcards" aria-hidden="true"></canvas>
+<div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero">
-    <h1 class="hero-title">MISTER<br>TIDY</h1>
+    <h1 class="hero-title">mister<br>tidy</h1>
     <a class="scroll-arrow" href="#content" aria-label="Scroll down">↓</a>
   </section>
 
   <section class="content" id="content">
-    <p class="lede">One script that <strong>migrates a standard MiSTer SD-card layout into the simplified layout</strong> — keeping only what the allowlists require, and keeping the helpers current on later runs.</p>
+  <div class="content-panel">
+    <p class="lede">One script that migrates a standard MiSTer SD-card layout into the simplified layout — keeping only what the allowlists require, and keeping the helpers current on later runs.</p>
+    <p class="status">Available.</p>
 
     <h2>Facts</h2>
     <ul>
@@ -61,6 +45,8 @@
       <li><strong>last.sh</strong> — reloads the last generated launch file</li>
       <li><strong>delete.sh</strong> — deletes the selected game and clears the launch file</li>
     </ul>
+  </div>
+  </section>
 </main>
 <script>
 // Background: cards run on the home sphere's rules, synchronised
@@ -314,5 +300,7 @@
   window.requestAnimationFrame(frame);
 })();
 </script>
+
+<script src="../page.js"></script>
 </body>
 </html>
