@@ -2,7 +2,7 @@
 // track whichever screen is showing. Scrolling itself is native.
 (function () {
   var screens = Array.prototype.slice.call(document.querySelectorAll("main > section"));
-  var contacts = [["btc", "bitcoin:you"], ["email", "mailto:you@example.com"],
+  var contacts = [["btc", "bitcoin:bc1quy7kfzh6hvdmysdr5x2znqld4y5rql62622epg"], ["email", "mailto:lplvlql@aol.com"],
     ["github", "https://github.com/lplvlql"], ["patreon", "https://www.patreon.com/you"]];
   screens.forEach(function (s) {
     var foot = document.createElement("nav");
@@ -16,20 +16,28 @@
     });
     s.appendChild(foot);
   });
+  var scroller = document.querySelector("body.nest main");
+  var motion = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  function sy() {
+    return scroller ? scroller.scrollTop : (window.scrollY || 0);
+  }
+  function sh() {
+    return scroller ? scroller.clientHeight : (window.innerHeight || 1);
+  }
   var navs = Array.prototype.slice.call(document.querySelectorAll("nav.screen-nav"));
-  navs.forEach(function (nav) {
-    Array.prototype.forEach.call(nav.children, function (link) {
-      link.addEventListener("click", function (e) {
-        e.preventDefault();
-        if (link.classList.contains("on")) return;
-        var target = document.querySelector(link.getAttribute("href"));
-        if (!target) return;
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+  function goTo(target) {
+    if (!target) return;
+    target.scrollIntoView({ behavior: motion, block: "start" });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("nav.screen-nav a, .content a[href^=\"#\"]"), function (link) {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (link.classList.contains("on")) return;
+      goTo(document.querySelector(link.getAttribute("href")));
     });
   });
   function spy() {
-    var y = (window.scrollY || 0) + (window.innerHeight || 1) / 2;
+    var y = sy() + sh() / 2;
     var on = 0;
     screens.forEach(function (s, i) {
       if (s.offsetTop <= y) on = i;
@@ -40,6 +48,6 @@
       });
     });
   }
-  window.addEventListener("scroll", spy, { passive: true });
+  (scroller || window).addEventListener("scroll", spy, { passive: true });
   spy();
 })();
