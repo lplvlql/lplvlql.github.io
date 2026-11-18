@@ -15,6 +15,10 @@ main{position:relative;z-index:1}
 .screen-nav a:active{background:rgba(10,10,10,.35);transform:scale(.94)}
 .screen-nav a.on:hover,.screen-nav a.on:active{background:none;transform:none}
 .screen-nav a.on{cursor:default}
+.screen-nav label{font-size:12px;line-height:1;color:rgba(10,10,10,.8);padding:4px 8px;border-radius:8px}
+.screen-nav label.on span{font-weight:700}
+.screen-nav label.on{cursor:default}
+.screen-nav label:not(.on){cursor:pointer}
 .contact{position:absolute;bottom:24px;left:0;right:0;display:flex;flex-direction:row;justify-content:center;gap:24px;font-size:12px;z-index:2}
 .contact a{font-size:12px;line-height:1;text-decoration:none;color:rgba(10,10,10,.8);padding:4px 8px;border-radius:8px;transition:background-color .2s,transform .1s}
 .contact a:hover{background:rgba(10,10,10,.2)}
@@ -52,16 +56,17 @@ body.nest .content-panel{margin-block:0;margin-inline:auto}
 main>section:target .content-panel{animation:fadein .6s ease}
 .content .flat{list-style:none;padding-left:0}
 .content .flat li{font-size:16px;line-height:1.6;margin-bottom:4px}
-.content h2 button{font:inherit;color:inherit;background:none;border:0;padding:4px 8px;border-radius:8px;margin:-4px -8px;cursor:pointer}
-.content h2 button:hover{background:rgba(10,10,10,.2)}
-.content h2 button:active{background:rgba(10,10,10,.35);transform:scale(.94)}
-.content .swap-main,.content .swap-list,.content .swap-decks{transition:opacity .2s ease,transform .2s ease}
-.content .swap-list,.content .swap-decks,.content.swapped-list .swap-main,.content.swapped-decks .swap-main,.content.swapped-list .swap-decks,.content.swapped-decks .swap-list{display:none}
-.content.swapped-list .swap-list,.content.swapped-decks .swap-decks{display:block}
-.content .swap-main.leaving{opacity:0;transform:translateX(-24px);pointer-events:none}
-.content .swap-list.leaving,.content .swap-decks.leaving{opacity:0;transform:translateX(24px);pointer-events:none}
-.content .enter-right{animation:swap-in-right .2s ease}
-.content .enter-left{animation:swap-in-left .2s ease}
-@keyframes swap-in-right{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
-@keyframes swap-in-left{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
-@media (prefers-reduced-motion:reduce){main>section:target .content-panel{animation:none}.content .swap-main,.content .swap-list,.content .swap-decks{transition:none}.content .enter-right,.content .enter-left{animation:none}}
+.content h2 button,.content h2 label{font:inherit;color:inherit;background:none;border:0;padding:4px 8px;border-radius:8px;margin:-4px -8px;cursor:pointer}
+.content h2 button:hover,.content h2 label:hover{background:rgba(10,10,10,.2)}
+.content h2 button:active,.content h2 label:active{background:rgba(10,10,10,.35);transform:scale(.94)}
+.eds-radio{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#eds .section-content{display:grid}
+#eds .swap-main,#eds .swap-list,#eds .swap-decks{grid-area:1/1;align-self:start}
+.content .swap-main,.content .swap-list,.content .swap-decks{transition:opacity .2s ease,transform .2s ease,display .2s allow-discrete}
+.content .swap-main,.content .swap-list,.content .swap-decks{display:none;opacity:0}
+.content .swap-main{transform:translateX(-24px)}
+.content .swap-list,.content .swap-decks{transform:translateX(24px)}
+#eds-show-main:checked ~ .section-content .swap-main,#eds-show-list:checked ~ .section-content .swap-list,#eds-show-decks:checked ~ .section-content .swap-decks{display:block;opacity:1;transform:none;transition-delay:.2s}
+@starting-style{#eds-show-main:checked ~ .section-content .swap-main{opacity:0;transform:translateX(-24px)}#eds-show-list:checked ~ .section-content .swap-list,#eds-show-decks:checked ~ .section-content .swap-decks{opacity:0;transform:translateX(24px)}}
+#eds-show-main:focus-visible ~ .section-content label[for="eds-show-main"],#eds-show-list:focus-visible ~ .section-content label[for="eds-show-list"],#eds-show-decks:focus-visible ~ .section-content label[for="eds-show-decks"]{outline:2px solid rgba(10,10,10,.8);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){main>section:target .content-panel{animation:none}.content .swap-main,.content .swap-list,.content .swap-decks{transition:none}}

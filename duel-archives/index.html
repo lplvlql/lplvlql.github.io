@@ -43,13 +43,16 @@
 </section>
 
   <section class="content" id="eds">
-<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="duel archives"><span>1</span></a><a href="#content" aria-label="games"><span>2</span></a><a href="#eds" class="on" aria-label="Eternal Duelist Soul to YGO02 Enhanced"><span>3</span></a><a href="#worldwide" aria-label="Worldwide Edition to YGO03 Enhanced"><span>4</span></a><a href="#wc2004" aria-label="World Championship to YGO04 Enhanced"><span>5</span></a><a href="#trials" aria-label="7 Trials to Glory to YGO05 Enhanced"><span>6</span></a><a href="#masters" aria-label="Ultimate Masters to YGO06 Enhanced"><span>7</span></a></nav>
+<input type="radio" name="eds-panel" id="eds-show-main" class="eds-radio" aria-label="roadmap" checked>
+<input type="radio" name="eds-panel" id="eds-show-list" class="eds-radio" aria-label="card pool">
+<input type="radio" name="eds-panel" id="eds-show-decks" class="eds-radio" aria-label="deck lists">
+<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="duel archives"><span>1</span></a><a href="#content" aria-label="games"><span>2</span></a><label for="eds-show-main" class="on" aria-label="roadmap"><span>3</span></label><a href="#worldwide" aria-label="Worldwide Edition to YGO03 Enhanced"><span>4</span></a><a href="#wc2004" aria-label="World Championship to YGO04 Enhanced"><span>5</span></a><a href="#trials" aria-label="7 Trials to Glory to YGO05 Enhanced"><span>6</span></a><a href="#masters" aria-label="Ultimate Masters to YGO06 Enhanced"><span>7</span></a></nav>
   <div class="section-content">
   <div class="content-panel swap-main">
     <p class="lede">Eternal Duelist Soul &#8594; YGO02 Enhanced</p>
-    <h2><button id="eds-open">card <span>pool</span></button></h2>
+    <h2><label for="eds-show-list">card <span>pool</span></label></h2>
     <p class="status">complete</p>
-    <h2><button id="eds-open-decks">deck <span>lists</span></button></h2>
+    <h2><label for="eds-show-decks">deck <span>lists</span></label></h2>
     <p class="status">complete</p>
     <h2>AI <span>behaviour</span></h2>
     <p class="status">in progress</p>
@@ -61,7 +64,7 @@
     <p class="status">planned</p>
   </div>
   <div class="content-panel swap-list">
-    <h2><button id="eds-back">back</button></h2>
+    <h2><label for="eds-show-main">back</label></h2>
 
     <ul class="flat">
       <li>7 Colored Fish</li>
@@ -337,7 +340,7 @@
     </ul>
   </div>
   <div class="content-panel swap-decks">
-    <h2><button id="eds-back-decks">back</button></h2>
+    <h2><label for="eds-show-main">back</label></h2>
 
     <h3>Yugi Muto (40)</h3>
     <ul class="flat">
@@ -1152,69 +1155,6 @@ startBackground("bg-pyramids", function (pts, rng, W, H) {
 , 90);
 </script>
 
-<script>
-// Card pool replaces the EDS roadmap; leaving restores it.
-(function () {
-  var section = document.getElementById("eds");
-  if (!section) return;
-  var main = section.querySelector(".swap-main");
-  var list = section.querySelector(".swap-list");
-  var decks = section.querySelector(".swap-decks");
-  var open = document.getElementById("eds-open");
-  var back = document.getElementById("eds-back");
-  var openDecks = document.getElementById("eds-open-decks");
-  var backDecks = document.getElementById("eds-back-decks");
-  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var current = null;
-  var busy = false;
-  list.inert = true;
-  decks.inert = true;
-  function panel(which) {
-    return which === "list" ? list : which === "decks" ? decks : main;
-  }
-  function activate(which, focusEl) {
-    section.classList.toggle("swapped-list", which === "list");
-    section.classList.toggle("swapped-decks", which === "decks");
-    main.inert = which !== null;
-    list.inert = which !== "list";
-    decks.inert = which !== "decks";
-    current = which;
-    if (which === null) section.scrollTop = 0;
-    var incoming = panel(which);
-    if (focusEl) focusEl.focus({ preventScroll: true });
-    if (reduced) return;
-    var enter = which === null ? "enter-left" : "enter-right";
-    incoming.classList.add(enter);
-    incoming.addEventListener("animationend", function h(e) {
-      if (e.target !== incoming) return;
-      incoming.removeEventListener("animationend", h);
-      incoming.classList.remove(enter);
-      busy = false;
-    });
-  }
-  function show(which, focusEl) {
-    if (busy || which === current) return;
-    var outgoing = panel(current);
-    if (reduced) { activate(which, focusEl); return; }
-    busy = true;
-    outgoing.classList.add("leaving");
-    outgoing.inert = true;
-    outgoing.addEventListener("transitionend", function h(e) {
-      if (e.target !== outgoing || e.propertyName !== "opacity") return;
-      outgoing.removeEventListener("transitionend", h);
-      outgoing.classList.remove("leaving");
-      activate(which, focusEl);
-    });
-  }
-  open.addEventListener("click", function () { show("list", back); });
-  back.addEventListener("click", function () { show(null, open); });
-  openDecks.addEventListener("click", function () { show("decks", backDecks); });
-  backDecks.addEventListener("click", function () { show(null, openDecks); });
-  document.querySelector("main").addEventListener("scroll", function () {
-    if (Math.abs(document.querySelector("main").scrollTop - section.offsetTop) > 2) show(null, null);
-  }, { passive: true });
-})();
-</script>
 <script src="../page.js?v=4"></script>
 </body>
 </html>
