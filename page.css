@@ -47,7 +47,6 @@ html:has(>body.nest){height:100%;overflow:hidden}
 body.nest{height:100%;overflow:hidden}
 body.nest main{height:100svh;overflow-y:auto;scroll-snap-type:y mandatory}
 body.nest main>section{position:relative;height:auto;min-height:100svh;box-sizing:border-box;overflow:visible;scroll-snap-align:start;display:flex;flex-direction:column}
-main>section>.contact{scroll-snap-align:end}
 body.nest .screen-nav,body.nest .section-content,body.nest .contact{flex-shrink:0}
 body.nest .screen-nav{position:static;padding-top:24px}
 body.nest .section-content{margin-block:auto}
