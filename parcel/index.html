@@ -24,7 +24,7 @@
   </div>
   </section>
 </main>
-<script src="../engine.js?v=2"></script>
+<script src="../engine.js?v=4"></script>
 <script>
 // Background: parcels — geometry only, the engine is shared.
 startBackground("bg-parcels", function (pts, rng, W, H) {
@@ -61,9 +61,9 @@ startBackground("bg-parcels", function (pts, rng, W, H) {
   }
 }
 , function (W, H) {
-  // Proportional scatter: parcel count scales with screen area, one
-  // parcel per shuffled cell so the spread stays even.
-  var spots = scatterCells(W, H, 9, 4, 24);
+  // Fixed field: population from world area and parcel spacing,
+  // positions from a seeded pool. Viewports crop; nothing regenerates.
+  var spots = scatterLayout(336, 64, 44);
   var cards = [];
   for (var i = 0; i < spots.length; i++) {
     cards.push({

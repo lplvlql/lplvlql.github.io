@@ -158,7 +158,7 @@
   </div>
   </section>
 </main>
-<script src="../engine.js?v=2"></script>
+<script src="../engine.js?v=4"></script>
 <script>
 // Background: simple point-down pyramids — geometry only, the engine is shared.
 startBackground("bg-pyramids", function (pts, rng, W, H) {
@@ -182,9 +182,9 @@ startBackground("bg-pyramids", function (pts, rng, W, H) {
   }
 }
 , function (W, H) {
-  // Proportional scatter: pyramid count scales with screen area, one
-  // pyramid per shuffled cell so the spread stays even.
-  var spots = scatterCells(W, H, 9, 4, 24);
+  // Fixed field: population from world area and pyramid spacing,
+  // positions from a seeded pool. Viewports crop; nothing regenerates.
+  var spots = scatterLayout(336, 64, 66);
   var cards = [];
   for (var i = 0; i < spots.length; i++) {
     cards.push({

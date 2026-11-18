@@ -2,22 +2,33 @@
 // proximity lines recomputed every frame, cursor attractor with
 // underdamped elastic settle, tilt gravity, reduced-motion clock.
 // Pages supply only geometry: build fills pts, place returns cards.
-// Proportional scatter: object count scales with screen area, one
-// object per shuffled cell so the spread stays even. No fixed grids.
-function scatterCells(W, H, ref, min, max) {
+// Fixed world: one seeded minimum-distance pool per page, sized for a
+// 2560x1440 field. Viewports crop the field; viewports never reshape
+// it. No grids, no regeneration.
+var WORLD_W = 2560, WORLD_H = 1440;
+var FIELD_SEED = (Math.random() * 4294967296) | 0; // fresh field every load, stable within it
+function scatterLayout(minDist, max, salt) {
   "use strict";
-  var n = Math.max(min, Math.min(max, Math.round(ref * W * H / (1280 * 800))));
-  var cols = Math.max(1, Math.round(Math.sqrt(n * W / H)));
-  var rows = Math.ceil(n / cols);
-  var cells = [];
-  for (var gy = 0; gy < rows; gy++) for (var gx = 0; gx < cols; gx++) cells.push([gx, gy]);
-  for (var ci = cells.length - 1; ci > 0; ci--) {
-    var cj = Math.floor(Math.random() * (ci + 1));
-    var tmp = cells[ci]; cells[ci] = cells[cj]; cells[cj] = tmp;
+  var seed = (FIELD_SEED + salt) | 0;
+  function rnd() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
   }
-  return cells.slice(0, n).map(function (c) {
-    return [(c[0] + 0.2 + Math.random() * 0.6) / cols, (c[1] + 0.2 + Math.random() * 0.6) / rows];
-  });
+  var r2 = (minDist / WORLD_W) * (minDist / WORLD_W);
+  var pool = [], guard = 0;
+  while (pool.length < max && guard < max * 400) {
+    guard++;
+    var cx = rnd(), cy = rnd(), ok = true;
+    for (var i = 0; i < pool.length; i++) {
+      var dx = cx - pool[i][0], dy = cy - pool[i][1];
+      if (dx * dx + dy * dy < r2) { ok = false; break; }
+    }
+    if (ok) pool.push([cx, cy]);
+  }
+  while (pool.length < max) pool.push([rnd(), rnd()]);
+  return pool.slice(0, Math.min(max, Math.round(WORLD_W * WORLD_H / (minDist * minDist))));
 }
 function startBackground(canvasId, build, place, maxz) {
   "use strict";
@@ -47,20 +58,44 @@ function startBackground(canvasId, build, place, maxz) {
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    scheduleLayout();
+  }
+  var layoutTimer = null;
+  function scheduleLayout() {
+    if (layoutTimer) clearTimeout(layoutTimer);
+    layoutTimer = setTimeout(layout, 150);
   }
   window.addEventListener("resize", resize); // the loop repaints, as home
-  resize();
 
-  var pts = [];
-  build(pts, rng, W, H);
-  var cards = place(W, H);
-
-  var N = cards.length * pts.length;
-  var bx = new Float32Array(N), by = new Float32Array(N); // projected homes
-  var px = new Float32Array(N), py = new Float32Array(N); // homes + elastic offset
-  var sf = new Float32Array(N);
-  var OFF = new Float32Array(N * 2), VEL = new Float32Array(N * 2);
+  // Layout owns the population: rebuild on viewport change, keeping
+  // survivors' spins so nothing jumps. Positions are a stable prefix
+  // of the seeded pool, so survivors never move.
+  var pts = [], cards = [], N = 0, activeN = 0;
+  var bx = new Float32Array(0), by = new Float32Array(0); // projected homes
+  var px = new Float32Array(0), py = new Float32Array(0); // homes + elastic offset
+  var sf = new Float32Array(0);
+  var OFF = new Float32Array(0), VEL = new Float32Array(0);
   var MAXZ = maxz; // farthest dot from the home centre
+  function layout() {
+    layoutTimer = null;
+    rng = mulberry(42);
+    pts = [];
+    build(pts, rng, W, H);
+    var fresh = place(W, H);
+    for (var i = 0; i < fresh.length && i < cards.length; i++) {
+      fresh[i].rx = cards[i].rx; fresh[i].ry = cards[i].ry; fresh[i].rz = cards[i].rz;
+      fresh[i].sx = cards[i].sx; fresh[i].sy = cards[i].sy; fresh[i].sz = cards[i].sz;
+    }
+    cards = fresh;
+    N = cards.length * pts.length;
+    bx = new Float32Array(N); by = new Float32Array(N);
+    px = new Float32Array(N); py = new Float32Array(N);
+    sf = new Float32Array(N);
+    OFF = new Float32Array(N * 2); VEL = new Float32Array(N * 2);
+  }
+  resize();
+  layout();
+  if (layoutTimer) { clearTimeout(layoutTimer); layoutTimer = null; }
 
   // Cursor attractor and its energy — the home page's numbers.
   var attrX = 0, attrY = 0, attrTX = 0, attrTY = 0, energy = 0;
@@ -68,8 +103,11 @@ function startBackground(canvasId, build, place, maxz) {
 
   function project(t) {
     var n = 0;
-    cards.forEach(function (c) {
-      var cxp = c.x * W, cyp = c.y * H;
+    var ox = (WORLD_W - W) / 2, oy = (WORLD_H - H) / 2; // centre the field
+    for (var ci = 0; ci < cards.length; ci++) {
+      var c = cards[ci];
+      var cxp = c.x * WORLD_W - ox, cyp = c.y * WORLD_H - oy;
+      if (cxp < -256 || cxp > W + 256 || cyp < -256 || cyp > H + 256) continue; // offscreen: cropped, not generated
       var ax = c.rx + t / 1000 * c.sx, ay = c.ry + t / 1000 * c.sy, az = c.rz + t / 1000 * c.sz;
       var cax = Math.cos(ax), sax = Math.sin(ax), cay = Math.cos(ay), say = Math.sin(ay), caz = Math.cos(az), saz = Math.sin(az);
       for (var i = 0; i < pts.length; i++, n++) {
@@ -82,7 +120,8 @@ function startBackground(canvasId, build, place, maxz) {
         var f = Math.max(0, Math.min(1, (MAXZ - z2) / (2 * MAXZ)));
         sf[n] = f + (1 - f) / 8; // front solid, back diffused — as the sphere
       }
-    });
+    }
+    activeN = n;
   }
 
   // Elastic step — the home sphere's spring, falloff and decay.
@@ -93,7 +132,7 @@ function startBackground(canvasId, build, place, maxz) {
     attrX += (attrTX - attrX) * ae;
     attrY += (attrTY - attrY) * ae;
     var R = Math.min(W, H) / 2;
-    for (var n = 0; n < N; n++) {
+    for (var n = 0; n < activeN; n++) {
       var ddx = bx[n] - attrX, ddy = by[n] - attrY;
       var dd2 = ddx * ddx + ddy * ddy;
       var w = Math.exp(-dd2 / (2 * 0.09 * R * R)) * energy * 0.45;
@@ -120,12 +159,12 @@ function startBackground(canvasId, build, place, maxz) {
     var DIST = 16, CELL = DIST;
     var buckets = [[], [], [], [], [], [], [], []];
     var grid = new Map();
-    for (var gj = 0; gj < N; gj++) {
+    for (var gj = 0; gj < activeN; gj++) {
       var gk = Math.floor(px[gj] / CELL) + Math.floor(py[gj] / CELL) * 4096;
       if (!grid.has(gk)) grid.set(gk, []);
       grid.get(gk).push(gj);
     }
-    for (var aj = 0; aj < N; aj++) {
+    for (var aj = 0; aj < activeN; aj++) {
       var ax8 = Math.floor(px[aj] / CELL), ay8 = Math.floor(py[aj] / CELL);
       for (var ox = -1; ox <= 1; ox++) for (var oy = -1; oy <= 1; oy++) {
         var cell = grid.get((ax8 + ox) + (ay8 + oy) * 4096);
@@ -153,7 +192,7 @@ function startBackground(canvasId, build, place, maxz) {
       }
       ctx.stroke();
     }
-    for (var dj = 0; dj < N; dj++) {
+    for (var dj = 0; dj < activeN; dj++) {
       ctx.globalAlpha = sf[dj];
       ctx.beginPath();
       ctx.arc(px[dj], py[dj], 1.5, 0, Math.PI * 2); // every dot the same size
@@ -175,7 +214,7 @@ function startBackground(canvasId, build, place, maxz) {
   window.addEventListener("pointermove", function (e) { feedAttractor(e.clientX, e.clientY); });
   var askedOrientation = false;
   window.addEventListener("pointerdown", function (e) {
-    if (e.target && e.target.closest && e.target.closest(".scroll-arrow")) return;
+    if (e.target && e.target.closest && e.target.closest("a, button")) return;
     if (!askedOrientation) {
       askedOrientation = true;
       if (window.DeviceOrientationEvent && typeof window.DeviceOrientationEvent.requestPermission === "function") {
