@@ -49,5 +49,20 @@
     });
   }
   (scroller || window).addEventListener("scroll", spy, { passive: true });
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  if (scroller) scroller.scrollTop = 0;
   spy();
+})();
+// EDS sub-panels exit back to the roadmap once the section leaves view.
+(function () {
+  var scroller = document.querySelector("body.nest main");
+  var eds = document.getElementById("eds");
+  var home = document.getElementById("eds-show-main");
+  if (!scroller || !eds || !home) return;
+  scroller.addEventListener("scroll", function () {
+    if (home.checked) return;
+    var top = scroller.scrollTop;
+    var bottom = eds.offsetTop + eds.offsetHeight - scroller.clientHeight;
+    if (top < eds.offsetTop || top > bottom) home.checked = true;
+  }, { passive: true });
 })();
