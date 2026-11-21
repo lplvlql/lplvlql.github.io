@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>mister tidy — lplvlql</title>
 <meta name="description" content="mister tidy puts console launchers directly in the MiSTer boot menu.">
-<link rel="stylesheet" href="../page.css?v=34">
+<link rel="stylesheet" href="../page.css?v=35">
 </head>
 <body class="pager">
 <canvas id="bg-sdcards" aria-hidden="true"></canvas>
@@ -28,7 +28,9 @@
       <a href="#scripts" aria-label="scripts"><span>3</span></a>
     </nav>
     <div class="content-panel">
-      <h2>before <span>menu</span></h2>
+      <p class="lede">main menu</p>
+
+      <h2>before <span>tidy</span></h2>
       <ul class="flat" role="list">
         <li>@Homebrew</li>
         <li>Arcade</li>
@@ -40,7 +42,7 @@
         <li>Utility</li>
       </ul>
 
-      <h2>after <span>menu</span></h2>
+      <h2>after <span>tidy</span></h2>
       <ul class="flat" role="list">
         <li>Gameboy</li>
         <li>GBA</li>
@@ -66,10 +68,16 @@
       <a href="#scripts" class="on" aria-current="location" aria-label="scripts"><span>3</span></a>
     </nav>
     <div class="content-panel">
+      <p class="lede">scripts</p>
+
       <h2>update <span>system</span></h2>
+      <p class="status">update.sh</p>
       <h2>shuffle <span>play</span></h2>
+      <p class="status">shuffle.sh</p>
       <h2>repeat <span>shuffled</span></h2>
+      <p class="status">repeat.sh</p>
       <h2>delete <span>shuffled</span></h2>
+      <p class="status">delete.sh</p>
     </div>
   </section>
   <div class="bend" aria-hidden="true"></div>
@@ -132,6 +140,6 @@ startBackground("bg-sdcards", function (pts, rng, W, H) {
 , Math.sqrt(84 * 84 / 4 + 110 * 110 / 4 + 6 * 6 / 4));
 </script>
 
-<script src="../page.js?v=13"></script>
+<script src="../page.js?v=14"></script>
 </body>
 </html>

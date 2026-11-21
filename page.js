@@ -3,14 +3,14 @@
 (function () {
   var screens = Array.prototype.slice.call(document.querySelectorAll("main > section"));
   var contacts = [["btc", "bitcoin:bc1quy7kfzh6hvdmysdr5x2znqld4y5rql62622epg"], ["email", "mailto:lplvlql@aol.com"],
-    ["github", "https://github.com/lplvlql"], ["patreon", "https://www.patreon.com/you"]];
+    ["github", "https://github.com/lplvlql"], ["patreon"]];
   screens.forEach(function (s) {
     var foot = document.createElement("nav");
     foot.className = "contact";
     foot.setAttribute("aria-label", "Contact");
     contacts.forEach(function (entry) {
-      var link = document.createElement("a");
-      link.href = entry[1];
+      var link = document.createElement(entry[1] ? "a" : "span");
+      if (entry[1]) link.href = entry[1];
       link.textContent = entry[0];
       foot.appendChild(link);
     });

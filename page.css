@@ -22,7 +22,7 @@ main{position:relative;z-index:1}
 .screen-nav label.on{cursor:default}
 .screen-nav label:not(.on){cursor:pointer}
 .contact{position:absolute;bottom:24px;left:0;right:0;display:flex;flex-direction:row;justify-content:center;gap:24px;font-size:12px;z-index:2}
-.contact a{font-size:12px;line-height:1;text-decoration:none;color:var(--ink);padding:4px 8px;border-radius:8px;transition:background-color .2s,transform .1s}
+.contact a,.contact span{font-size:12px;line-height:1;text-decoration:none;color:var(--ink);padding:4px 8px;border-radius:8px;transition:background-color .2s,transform .1s}
 .contact a:hover{background:rgba(10,10,10,.2)}
 .contact a:active{background:rgba(10,10,10,.35);transform:scale(.94)}
 .content{min-height:100svh;display:flex;position:relative}
