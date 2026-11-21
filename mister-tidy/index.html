@@ -4,28 +4,62 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>mister tidy — lplvlql</title>
-<meta name="description" content="mister tidy. One script that migrates a standard MiSTer SD-card layout into the simplified layout.">
-<link rel="stylesheet" href="../page.css?v=33">
+<meta name="description" content="Mister Tidy puts console launchers directly in the MiSTer boot menu.">
+<link rel="stylesheet" href="../page.css?v=34">
 </head>
 <body class="pager">
 <canvas id="bg-sdcards" aria-hidden="true"></canvas>
 <div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero" id="top">
-<nav class="screen-nav" aria-label="Screens"><a href="#top" class="on" aria-label="mister tidy"><span>1</span></a><a href="#content" aria-label="info"><span>2</span></a></nav>
+    <nav class="screen-nav" aria-label="Screens">
+      <a href="#top" class="on" aria-current="location" aria-label="mister tidy"><span>1</span></a>
+      <a href="#content" aria-label="main menu"><span>2</span></a>
+    </nav>
     <h1 class="hero-title">mister<br>tidy</h1>
   </section>
-<div class="bend" aria-hidden="true"></div>
+  <div class="bend" aria-hidden="true"></div>
 
   <section class="content" id="content">
-<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="mister tidy"><span>1</span></a><a href="#content" class="on" aria-label="info"><span>2</span></a></nav>
-  <div class="content-panel">
-    <p class="lede">A script that simplifies a MiSTer SD card by removing unnecessary files and organizing what's left.</p>
-    <p class="status">Available.</p>
-    <p><a href="https://github.com/lplvlql/mister-simp">GitHub</a></p>
-  </div>
+    <nav class="screen-nav" aria-label="Screens">
+      <a href="#top" aria-label="mister tidy"><span>1</span></a>
+      <a href="#content" class="on" aria-current="location" aria-label="main menu"><span>2</span></a>
+    </nav>
+    <div class="content-panel">
+      <p class="lede">console launchers in the MiSTer boot menu</p>
+
+      <h2>before <span>Mister Tidy</span></h2>
+      <ul class="flat" role="list">
+        <li>@Homebrew</li>
+        <li>Arcade</li>
+        <li>Computer</li>
+        <li>Console</li>
+        <li>CVBS YC Cores</li>
+        <li>ExtraCores</li>
+        <li>Other</li>
+        <li>Utility</li>
+      </ul>
+
+      <h2>after <span>Mister Tidy</span></h2>
+      <ul class="flat" role="list">
+        <li>Gameboy</li>
+        <li>GBA</li>
+        <li>MegaCD</li>
+        <li>MegaDrive</li>
+        <li>N64</li>
+        <li>NeoGeo</li>
+        <li>NES</li>
+        <li>PSX</li>
+        <li>Saturn</li>
+        <li>SMS</li>
+        <li>SNES</li>
+        <li>TurboGrafx16</li>
+      </ul>
+
+      <p><a href="https://github.com/lplvlql/mister-tidy">GitHub</a></p>
+    </div>
   </section>
-<div class="bend" aria-hidden="true"></div>
+  <div class="bend" aria-hidden="true"></div>
 </main>
 <script src="../engine.js?v=4"></script>
 <script>
@@ -85,6 +119,6 @@ startBackground("bg-sdcards", function (pts, rng, W, H) {
 , Math.sqrt(84 * 84 / 4 + 110 * 110 / 4 + 6 * 6 / 4));
 </script>
 
-<script src="../page.js?v=9"></script>
+<script src="../page.js?v=13"></script>
 </body>
 </html>

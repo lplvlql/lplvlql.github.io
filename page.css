@@ -50,6 +50,7 @@ body.nest{height:100%;overflow:hidden}
 body.nest main{height:100svh;overflow-y:auto;scroll-snap-type:y mandatory}
 body.nest main>section{position:relative;min-height:100svh;scroll-snap-align:start;display:flex;flex-direction:column}
 main>.bend{height:100svh;margin-top:-100svh;scroll-snap-align:end;scroll-snap-stop:always;pointer-events:none}
+main>#eds:has(#eds-show-main:checked)+.bend{scroll-snap-align:none}
 body.nest .screen-nav,body.nest .section-content,body.nest .contact{flex-shrink:0}
 body.nest .screen-nav{position:static;padding-top:24px}
 body.nest .section-content{margin-block:auto}
