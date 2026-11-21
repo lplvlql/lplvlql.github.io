@@ -15,6 +15,7 @@
     <nav class="screen-nav" aria-label="Screens">
       <a href="#top" class="on" aria-current="location" aria-label="mister tidy"><span>1</span></a>
       <a href="#content" aria-label="main menu"><span>2</span></a>
+      <a href="#scripts" aria-label="scripts"><span>3</span></a>
     </nav>
     <h1 class="hero-title">mister<br>tidy</h1>
   </section>
@@ -24,6 +25,7 @@
     <nav class="screen-nav" aria-label="Screens">
       <a href="#top" aria-label="mister tidy"><span>1</span></a>
       <a href="#content" class="on" aria-current="location" aria-label="main menu"><span>2</span></a>
+      <a href="#scripts" aria-label="scripts"><span>3</span></a>
     </nav>
     <div class="content-panel">
       <h2>before <span>menu</span></h2>
@@ -52,6 +54,27 @@
         <li>SMS</li>
         <li>SNES</li>
         <li>TurboGrafx16</li>
+      </ul>
+    </div>
+  </section>
+  <div class="bend" aria-hidden="true"></div>
+
+  <section class="content" id="scripts">
+    <nav class="screen-nav" aria-label="Screens">
+      <a href="#top" aria-label="mister tidy"><span>1</span></a>
+      <a href="#content" aria-label="main menu"><span>2</span></a>
+      <a href="#scripts" class="on" aria-current="location" aria-label="scripts"><span>3</span></a>
+    </nav>
+    <div class="content-panel">
+      <h2>scripts</h2>
+      <ul class="flat" role="list">
+        <li><strong>mister-tidy.sh</strong> — install helpers and migrate the card</li>
+        <li><strong>clean.sh</strong> — normalize names and prune the card</li>
+        <li><strong>update.sh</strong> — sync cores, game data, BIOS files, and helpers</li>
+        <li><strong>cache.sh</strong> — build the random-game cache</li>
+        <li><strong>random.sh</strong> — launch a random cached game</li>
+        <li><strong>last.sh</strong> — relaunch the last selection</li>
+        <li><strong>delete.sh</strong> — delete the selected game and clear its launch file</li>
       </ul>
     </div>
   </section>
