@@ -4,9 +4,9 @@ Project hub for lplvlql. The root page is only an index — each project has its
 
 - `chronicle/` — Chronicle
 - `duel-archives/` — Duel Archives
-- `ledger/` — Ledger
-- `parcel/` — Ledger Parcel
-- `parcel-pocket/` — Ledger Pocket
+- `ledger/` — Ledger Protocol
+- `desk/` — Ledger Desk
+- `pocket/` — Ledger Pocket
 - `poker/` — Ledger Poker
 - `mister-tidy/` — mister tidy
 - `usual-time/` — Usual Time
