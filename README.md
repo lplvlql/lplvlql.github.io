@@ -8,7 +8,7 @@ Project hub for lplvlql. The root page is only an index — each project has its
 - `parcel/` — Ledger Parcel
 - `parcel-pocket/` — Ledger Pocket
 - `poker/` — Ledger Poker
-- `mister-tidy/` — Mister Tidy
+- `mister-tidy/` — mister tidy
 - `usual-time/` — Usual Time
 
 Plain static files, relative links, no build step. Runs on GitHub Pages today; the same files can be served from Ledger hosting later without changes.
