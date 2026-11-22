@@ -1,6 +1,6 @@
-/* --bar: the space a phone address bar takes now. Sections are as tall as the window without it
-   and keep that much empty at the end, so the next section never shows. */
-:root{--bar:calc(100lvh - 100dvh);--ink:rgba(10,10,10,.8);--wrap:720px;--frost:rgba(255,255,255,.2);--blur:blur(6px)}
+/* --tail: blank end of every section, longer than any phone address bar, hidden or see-through,
+   so the next section never shows under it. */
+:root{--tail:calc(100lvh - 100dvh + 120px);--ink:rgba(10,10,10,.8);--wrap:720px;--frost:rgba(255,255,255,.2);--blur:blur(6px)}
 *{box-sizing:border-box}
 body{margin:0;touch-action:pan-y pinch-zoom;-webkit-user-select:none;user-select:none;background:#fff;color:var(--ink);font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;-webkit-font-smoothing:antialiased}
 a{color:var(--ink);text-decoration:none}
@@ -13,19 +13,19 @@ a::before,label::before{content:"";display:inline-block;width:4px;height:4px;mar
 .screen-nav a:active::after,.contact a:active::after,.content h2 a:active::after,.content h2 label:active::after,.stark-btn:active::after{background:rgba(10,10,10,.4);transform:scale(.94)}
 .screen-nav a.on::after{display:none}
 canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
-/* The frosted column behind the text. */
-.pager::after{content:"";position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(var(--wrap),100%);background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);pointer-events:none}
+/* The frosted column behind the text: part of the page, since iOS draws nothing fixed under its address bar. */
+.pager main::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(var(--wrap),100%);background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);pointer-events:none}
 main{position:relative;z-index:1}
-main>section{position:relative;padding-bottom:var(--bar)}
-.hero{height:100lvh;display:flex;align-items:center;justify-content:center}
+main>section{position:relative;padding-bottom:var(--tail)}
+.hero{height:calc(100lvh + 120px);display:flex;align-items:center;justify-content:center}
 .hero-title{font-weight:700;font-size:clamp(32px,8vw,80px);line-height:1;letter-spacing:.06em;text-align:center;margin:0}
 .screen-nav{position:absolute;top:24px;left:0;right:0;display:flex;justify-content:center;gap:16px;z-index:2}
 .screen-nav a,.screen-nav label{font-size:12px;line-height:1;padding:4px 8px}
 .screen-nav .on{cursor:default}
 .screen-nav .on span{font-weight:700}
-.contact{position:absolute;bottom:calc(24px + var(--bar));left:0;right:0;display:flex;justify-content:center;gap:24px;font-size:12px;z-index:2}
+.contact{position:absolute;bottom:calc(24px + var(--tail));left:0;right:0;display:flex;justify-content:center;gap:24px;font-size:12px;z-index:2}
 .contact a,.contact span{line-height:1;padding:4px 8px}
-.content{min-height:100lvh;display:flex}
+.content{min-height:calc(100lvh + 120px);display:flex}
 .content-panel{margin:auto;width:100%;max-width:var(--wrap);padding:clamp(48px,8vh,80px) clamp(24px,6vh,40px)}
 .content h2{font-size:20px;font-weight:700;line-height:1.6;margin:32px 0 16px}
 .content h2 span{font-weight:400}
@@ -40,9 +40,9 @@ main>section{position:relative;padding-bottom:var(--bar)}
 @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
 html:has(>.pager){scroll-snap-type:y mandatory}
 .pager main>section{scroll-snap-align:start}
-.tall main>section{min-height:100lvh;display:flex;flex-direction:column}
+.tall main>section{min-height:calc(100lvh + 120px);display:flex;flex-direction:column}
 /* A section taller than the window also snaps at its end. */
-main>section::after{content:"";position:absolute;bottom:var(--bar);left:0;right:0;height:100dvh;scroll-snap-align:end;scroll-snap-stop:always;pointer-events:none}
+main>section::after{content:"";position:absolute;bottom:var(--tail);left:0;right:0;height:100dvh;scroll-snap-align:end;scroll-snap-stop:always;pointer-events:none}
 main>#eds:has(#eds-show-main:checked)::after{scroll-snap-align:none}
 .tall .screen-nav,.tall .section-content,.tall .contact{flex-shrink:0}
 .tall .screen-nav{position:static;padding-top:24px}
