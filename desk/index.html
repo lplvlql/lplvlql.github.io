@@ -5,52 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ledger desk — lplvlql</title>
 <meta name="description" content="ledger desk">
-<link rel="stylesheet" href="../page.css?v=59">
+<link rel="stylesheet" href="../page.css?v=60">
 </head>
 <body class="pager">
 <canvas id="bg-cubes" aria-hidden="true"></canvas>
 <div class="page-column" aria-hidden="true"></div>
 <main>
-  <section class="hero" id="top">
-<nav class="screen-nav" aria-label="Screens"><a href="#top" class="on" aria-label="ledger desk"><span>1</span></a><a href="#content" aria-label="info"><span>2</span></a></nav>
+  <section class="hero" id="top" data-label="ledger desk">
     <h1 class="hero-title">ledger<br>desk</h1>
   </section>
 <div class="bend" aria-hidden="true"></div>
 
-  <section class="content" id="content">
-<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="ledger desk"><span>1</span></a><a href="#content" class="on" aria-label="info"><span>2</span></a></nav>
+  <section class="content" id="roadmap" data-label="roadmap">
   <div class="content-panel">
-    <p class="lede">a desktop app for sharing files directly between computers, built on ledger</p>
-    <p class="status">in development</p>
+    <h2>desktop <span>app</span></h2>
+    <p class="status">complete</p>
+    <h2>field <span>testing</span></h2>
+    <p class="status">in progress</p>
+    <h2>public <span>release</span></h2>
+    <p class="status">planned</p>
   </div>
   </section>
 <div class="bend" aria-hidden="true"></div>
 </main>
-<script src="../engine.js?v=11"></script>
+<script src="../engine.js?v=12"></script>
 <script>
 // Background: one cube — geometry only, the engine is shared.
 startBackground("bg-cubes", function (pts, rng, W, H) {
   // One cube: the full-size block of the ledger family.
   dotCube(pts, rng, 0, 0, 0, 32, 7);
 }
-, function (W, H) {
-  // Fixed field: population from world area and spacing,
-  // positions from a seeded pool. Viewports crop; nothing regenerates.
-  var spots = scatterLayout(336, 64, 44);
-  var homes = [];
-  for (var i = 0; i < spots.length; i++) {
-    homes.push({
-      x: spots[i][0],
-      y: spots[i][1],
-      rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2,
-      sx: (Math.random() - 0.5) * 0.25, sy: (Math.random() - 0.5) * 0.2, sz: (Math.random() - 0.5) * 0.15
-    });
-  }
-  return homes;
-}
+, function () { return scatterHomes(336, 44); }
 , Math.sqrt(3) * 32);
 </script>
 
-<script src="../page.js?v=14"></script>
+<script src="../page.js?v=15"></script>
 </body>
 </html>

@@ -1,17 +1,14 @@
 # lplvlql.github.io
 
-Project hub for lplvlql. The root page is only an index — each project has its own site:
+Project hub. The root page links to each project:
 
-- `chronicle/` — Chronicle
-- `duel-archives/` — Duel Archives
-- `ledger/` — Ledger Protocol
-- `desk/` — Ledger Desk
-- `pocket/` — Ledger Pocket
-- `poker/` — Ledger Poker
-- `mister-tidy/` — mister tidy
-- `usual-time/` — Usual Time
+- `chronicle/`
+- `duel-archives/`
+- `ledger/`, `desk/`, `pocket/`, `poker/`
+- `mister-tidy/`
+- `usual-time/`
 
-Plain static files, relative links, no build step. Runs on GitHub Pages today; the same files can be served from Ledger hosting later without changes.
+Shared files: `page.css` (all styles), `page.js` (screen navs and footer), `engine.js` (dotted backgrounds). Plain static files, no build step, served by GitHub Pages.
 
 Preview locally:
 

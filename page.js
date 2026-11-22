@@ -1,7 +1,25 @@
-// Shared subpage behavior: the static number navs jump smoothly.
-// Scrolling itself is native.
+// Shared subpage behavior: each screen gets its number nav and contact
+// footer, built from the sections' data-label names; navs jump smoothly.
 (function () {
   var screens = Array.prototype.slice.call(document.querySelectorAll("main > section"));
+  // A screen with panel switches returns to its first panel from its own number.
+  screens.forEach(function (s) {
+    var nav = document.createElement("nav");
+    nav.className = "screen-nav";
+    nav.setAttribute("aria-label", "Screens");
+    screens.forEach(function (t, i) {
+      var radio = t === s && s.querySelector("input[type=radio]");
+      var item = document.createElement(radio ? "label" : "a");
+      if (radio) item.htmlFor = radio.id; else item.href = "#" + t.id;
+      if (t === s) { item.className = "on"; item.setAttribute("aria-current", "location"); }
+      item.setAttribute("aria-label", t.getAttribute("data-label"));
+      item.innerHTML = "<span>" + (i + 1) + "</span>";
+      nav.appendChild(item);
+    });
+    var first = s.firstElementChild;
+    while (first && first.tagName === "INPUT") first = first.nextElementSibling;
+    s.insertBefore(nav, first);
+  });
   var contacts = [["btc", "bitcoin:bc1quy7kfzh6hvdmysdr5x2znqld4y5rql62622epg"], ["email", "mailto:lplvlql@aol.com"],
     ["github", "https://github.com/lplvlql"], ["patreon"]];
   screens.forEach(function (s) {

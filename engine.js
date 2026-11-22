@@ -3,7 +3,7 @@
 // the cursor (or device tilt) moves the camera, so every shape is seen
 // from a new angle and nearer homes drift further than distant ones;
 // while it moves, dots shimmer between nearby positions.
-// Pages supply only geometry: build fills pts, place returns cards;
+// Pages supply only geometry: build fills pts, place returns homes;
 // an optional link distance joins nearby homes with dotted lines.
 // Fixed world: one seeded minimum-distance pool per page, sized for a
 // 2560x1440 field. Viewports crop the field; viewports never reshape
@@ -33,6 +33,18 @@ function scatterLayout(minDist, max, salt) {
   while (pool.length < max) pool.push([rnd(), rnd()]);
   return pool.slice(0, Math.min(max, Math.round(WORLD_W * WORLD_H / (minDist * minDist))));
 }
+// Homes for a page: positions from the seeded pool, each with a random
+// starting angle and slow spin. Pages pick only spacing and a seed.
+function scatterHomes(minDist, salt) {
+  "use strict";
+  return scatterLayout(minDist, 64, salt).map(function (p) {
+    return {
+      x: p[0], y: p[1],
+      rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2,
+      sx: (Math.random() - 0.5) * 0.25, sy: (Math.random() - 0.5) * 0.2, sz: (Math.random() - 0.5) * 0.15
+    };
+  });
+}
 // A dotted cube: grid x grid dots on each of six faces, centred at
 // (cx, cy, cz) with half-size h. Shared by the ledger family of pages.
 function dotCube(pts, rng, cx, cy, cz, h, grid) {
@@ -54,7 +66,7 @@ function startBackground(canvasId, build, place, maxz, link) {
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var W = 0, H = 0, lastFrame = null;
 
-  // Same seeded RNG as the home sphere: identical on every load.
+  // Seeded RNG: geometry is identical on every load.
   function mulberry(seed) {
     return function () {
       seed |= 0; seed = seed + 0x6D2B79F5 | 0;
@@ -80,12 +92,12 @@ function startBackground(canvasId, build, place, maxz, link) {
     if (layoutTimer) clearTimeout(layoutTimer);
     layoutTimer = setTimeout(layout, 150);
   }
-  window.addEventListener("resize", resize); // the loop repaints, as home
+  window.addEventListener("resize", resize); // the loop repaints
 
   // Layout owns the population: rebuild on viewport change, keeping
   // survivors' spins so nothing jumps. Positions are a stable prefix
   // of the seeded pool, so survivors never move.
-  var pts = [], cards = [], N = 0, activeN = 0;
+  var pts = [], homes = [], N = 0, activeN = 0;
   var bx = new Float32Array(0), by = new Float32Array(0); // projected dots
   var sf = new Float32Array(0);
   var MAXZ = maxz; // farthest dot from the home centre
@@ -96,12 +108,12 @@ function startBackground(canvasId, build, place, maxz, link) {
     pts = [];
     build(pts, rng, W, H);
     var fresh = place(W, H);
-    for (var i = 0; i < fresh.length && i < cards.length; i++) {
-      fresh[i].rx = cards[i].rx; fresh[i].ry = cards[i].ry; fresh[i].rz = cards[i].rz;
-      fresh[i].sx = cards[i].sx; fresh[i].sy = cards[i].sy; fresh[i].sz = cards[i].sz;
+    for (var i = 0; i < fresh.length && i < homes.length; i++) {
+      fresh[i].rx = homes[i].rx; fresh[i].ry = homes[i].ry; fresh[i].rz = homes[i].rz;
+      fresh[i].sx = homes[i].sx; fresh[i].sy = homes[i].sy; fresh[i].sz = homes[i].sz;
     }
-    cards = fresh;
-    N = cards.length * pts.length;
+    homes = fresh;
+    N = homes.length * pts.length;
     bx = new Float32Array(N); by = new Float32Array(N);
     sf = new Float32Array(N);
   }
@@ -124,8 +136,8 @@ function startBackground(canvasId, build, place, maxz, link) {
     var jump = SHIMMER * Math.min(1, (Math.abs(viewTX - viewX) + Math.abs(viewTY - viewY)) * 2);
     var step = Math.floor(t / 60);
     var ox = (WORLD_W - W) / 2, oy = (WORLD_H - H) / 2; // centre the field
-    for (var ci = 0; ci < cards.length; ci++) {
-      var c = cards[ci];
+    for (var ci = 0; ci < homes.length; ci++) {
+      var c = homes[ci];
       var depth = (ci * 0.6180339887) % 1 * 2 - 1; // stable per home, -1 far to 1 near
       var cxp = c.x * WORLD_W - ox + viewX * depth * PARALLAX, cyp = c.y * WORLD_H - oy + viewY * depth * PARALLAX;
       if (cxp < -256 || cxp > W + 256 || cyp < -256 || cyp > H + 256) continue; // offscreen: cropped, not generated
@@ -144,7 +156,7 @@ function startBackground(canvasId, build, place, maxz, link) {
         bx[n] = cxp + x4 * s; by[n] = cyp + y5 * s;
         if (jump > 0.05) { bx[n] += hop(n, step) * jump; by[n] += hop(n, step + 0.5) * jump; }
         var f = Math.max(0, Math.min(1, (MAXZ - z5) / (2 * MAXZ)));
-        sf[n] = f + (1 - f) / 8; // front solid, back diffused — as the sphere
+        sf[n] = f + (1 - f) / 8; // front solid, back diffused
       }
     }
     activeN = n;
@@ -155,7 +167,7 @@ function startBackground(canvasId, build, place, maxz, link) {
     ctx.fillStyle = "rgba(10,10,10,.8)";
     ctx.strokeStyle = "rgba(10,10,10,.8)";
     ctx.lineWidth = 0.5;
-    // Lines are dynamic, as home: dots within range of each other
+    // Lines are dynamic: dots within range of each other
     // right now get a line, found through a spatial grid, bucketed
     // by opacity so each bucket is a single stroke.
     // Cutoff a bit past the dot spacing — not a neighbour count.
@@ -240,7 +252,7 @@ function startBackground(canvasId, build, place, maxz, link) {
     viewTY = Math.max(-1, Math.min(1, (e.beta - tilt0[1]) / 30));
   });
 
-  var animNow = 2989; // the home clock's starting moment
+  var animNow = 2989; // fixed starting moment, so first frames match every load
   function frame(now) {
     var dt = lastFrame === null ? 16 : Math.min(50, now - lastFrame);
     lastFrame = now;

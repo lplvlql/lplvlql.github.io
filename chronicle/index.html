@@ -5,20 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>chronicle — lplvlql</title>
 <meta name="description" content="a drafting card game">
-<link rel="stylesheet" href="../page.css?v=59">
+<link rel="stylesheet" href="../page.css?v=60">
 </head>
 <body class="pager">
 <canvas id="bg-cards" aria-hidden="true"></canvas>
 <div class="page-column" aria-hidden="true"></div>
 <main>
-  <section class="hero" id="top">
-<nav class="screen-nav" aria-label="Screens"><a href="#top" class="on" aria-label="chronicle"><span>1</span></a><a href="#development" aria-label="development"><span>2</span></a><a href="#design" aria-label="game design"><span>3</span></a><a href="#artwork" aria-label="artwork"><span>4</span></a></nav>
+  <section class="hero" id="top" data-label="chronicle">
     <h1 class="hero-title">chronicle</h1>
   </section>
 <div class="bend" aria-hidden="true"></div>
 
-  <section class="content" id="development">
-<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="chronicle"><span>1</span></a><a href="#development" class="on" aria-label="development"><span>2</span></a><a href="#design" aria-label="game design"><span>3</span></a><a href="#artwork" aria-label="artwork"><span>4</span></a></nav>
+  <section class="content" id="development" data-label="development">
   <div class="content-panel">
     <h2><a href="#design">game <span>design</span></a></h2>
     <p class="status">in progress</p>
@@ -32,8 +30,7 @@
   </section>
 <div class="bend" aria-hidden="true"></div>
 
-  <section class="content" id="design">
-<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="chronicle"><span>1</span></a><a href="#development" aria-label="development"><span>2</span></a><a href="#design" class="on" aria-label="game design"><span>3</span></a><a href="#artwork" aria-label="artwork"><span>4</span></a></nav>
+  <section class="content" id="design" data-label="game design">
   <div class="content-panel">
     <h2>players <span>2–6</span></h2>
 
@@ -54,8 +51,7 @@
   </section>
 <div class="bend" aria-hidden="true"></div>
 
-  <section class="content" id="artwork">
-<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="chronicle"><span>1</span></a><a href="#development" aria-label="development"><span>2</span></a><a href="#design" aria-label="game design"><span>3</span></a><a href="#artwork" class="on" aria-label="artwork"><span>4</span></a></nav>
+  <section class="content" id="artwork" data-label="artwork">
   <div class="content-panel">
     <div class="gallery">
       <img src="art/FC01.jpg?v=2" alt="Sorela, Twin Passage" loading="lazy">
@@ -69,8 +65,8 @@
   </section>
 <div class="bend" aria-hidden="true"></div>
 </main>
-<script src="../page.js?v=14"></script>
-<script src="../engine.js?v=11"></script>
+<script src="../page.js?v=15"></script>
+<script src="../engine.js?v=12"></script>
 <script>
 // Background: dotted cards — geometry only, the engine is shared.
 startBackground("bg-cards", function (pts, rng, W, H) {
@@ -83,21 +79,7 @@ startBackground("bg-cards", function (pts, rng, W, H) {
     ]);
   }
 }
-, function (W, H) {
-  // Fixed field: population from world area and card spacing,
-  // positions from a seeded pool. Viewports crop; nothing regenerates.
-  var spots = scatterLayout(256, 64, 11);
-  var cards = [];
-  for (var i = 0; i < spots.length; i++) {
-    cards.push({
-      x: spots[i][0],
-      y: spots[i][1],
-      rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2,
-      sx: (Math.random() - 0.5) * 0.25, sy: (Math.random() - 0.5) * 0.2, sz: (Math.random() - 0.5) * 0.15,
-    });
-  }
-  return cards;
-}
+, function () { return scatterHomes(256, 11); }
 , Math.sqrt(92 * 92 / 4 + 138 * 138 / 4));
 </script>
 </body>
