@@ -57,7 +57,8 @@ function startBackground(homes, build, link) {
   var CAM; // camera distance: gentle perspective at any size
   function resize() {
     var dpr = Math.min(2, devicePixelRatio);
-    W = innerWidth; H = innerHeight;
+    if (canvas.clientWidth === W && canvas.clientHeight === H) return; // an address bar slid
+    W = canvas.clientWidth; H = canvas.clientHeight;
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

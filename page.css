@@ -1,5 +1,5 @@
-/* --bar: what a phone address bar covers right now. */
-:root{--bar:calc(100lvh - 100dvh);--ink:rgba(10,10,10,.8);--wrap:720px;--frost:rgba(255,255,255,.2);--blur:blur(6px)}
+/* --bar: the most a phone address bar covers. Nothing here changes size while it slides. */
+:root{--bar:calc(100lvh - 100svh);--ink:rgba(10,10,10,.8);--wrap:720px;--frost:rgba(255,255,255,.2);--blur:blur(6px)}
 *{box-sizing:border-box}
 body{margin:0;touch-action:pan-y pinch-zoom;-webkit-user-select:none;user-select:none;background:#fff;color:var(--ink);font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;-webkit-font-smoothing:antialiased}
 a{color:var(--ink);text-decoration:none}
@@ -11,6 +11,7 @@ a::before,label::before{content:"";display:inline-block;width:4px;height:4px;mar
 .screen-nav a:hover::after,.contact a:hover::after,.content h2 a:hover::after,.content h2 label:hover::after,.stark-btn:hover::after{background:rgba(10,10,10,.2)}
 .screen-nav a:active::after,.contact a:active::after,.content h2 a:active::after,.content h2 label:active::after,.stark-btn:active::after{background:rgba(10,10,10,.4);transform:scale(.94)}
 canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+.pager canvas{height:100lvh}
 /* The frosted column behind the text: part of the page, since iOS draws nothing fixed under its address bar. */
 .pager main::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(var(--wrap),100%);background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);pointer-events:none}
 main{position:relative;z-index:1}
@@ -40,9 +41,6 @@ main>section{position:relative;padding-bottom:var(--bar)}
 @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
 html:has(>.pager){scroll-snap-type:y mandatory}
 .pager main>section{scroll-snap-align:start}
-/* A section taller than the window also snaps at its end. */
-main>section::after{content:"";position:absolute;bottom:var(--bar);left:0;right:0;height:100dvh;scroll-snap-align:end;scroll-snap-stop:always;pointer-events:none}
-main>#eds:has(#eds-show-main:checked)::after{scroll-snap-align:none}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 main>section:target .content-panel{animation:fadein .6s ease}
 .content .flat{list-style:none;margin:0 0 20px;padding:0;-webkit-user-select:text;user-select:text}
@@ -57,7 +55,7 @@ main>section:target .content-panel{animation:fadein .6s ease}
 @media (prefers-reduced-motion:reduce){main>section:target .content-panel{animation:none}#eds .content-panel{transition:none}}
 /* The pedal sits above its chain and takes the height the rest of the screen leaves it. */
 #pedal .content-panel{padding-block:48px 64px}
-.pedal-map{display:block;touch-action:none;height:clamp(240px,calc(100dvh - 482px),456px);overflow:visible}
+.pedal-map{display:block;touch-action:none;height:clamp(240px,calc(100svh - 482px),456px);overflow:visible}
 .pedal-map .body{fill:none;stroke:var(--ink);stroke-width:.4;stroke-dasharray:.6 1.2}
 .pedal-map .part{cursor:pointer;outline:none}
 .pedal-map circle,.pedal-map rect{fill:#fff;stroke:var(--ink);stroke-width:.5;transition:fill .2s}
