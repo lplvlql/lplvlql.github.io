@@ -1,31 +1,31 @@
-/* --tail: blank end of every section, longer than any phone address bar, hidden or see-through,
-   so the next section never shows under it. */
-:root{--tail:calc(100lvh - 100dvh + 120px);--ink:rgba(10,10,10,.8);--wrap:720px;--frost:rgba(255,255,255,.2);--blur:blur(6px)}
+/* --bar: what a phone address bar covers right now. */
+:root{--bar:calc(100lvh - 100dvh);--ink:rgba(10,10,10,.8);--wrap:720px;--frost:rgba(255,255,255,.2);--blur:blur(6px)}
 *{box-sizing:border-box}
 body{margin:0;touch-action:pan-y pinch-zoom;-webkit-user-select:none;user-select:none;background:#fff;color:var(--ink);font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;-webkit-font-smoothing:antialiased}
 a{color:var(--ink);text-decoration:none}
 a::before,label::before{content:"";display:inline-block;width:4px;height:4px;margin-right:4px;border-radius:50%;background:currentColor;vertical-align:middle}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 /* Link pill: hover shades it, press darkens and shrinks it; the text never moves. */
-.screen-nav a,.contact a,.content h2 a,.content h2 label,.stark-btn{position:relative;isolation:isolate}
-.screen-nav a::after,.contact a::after,.content h2 a::after,.content h2 label::after,.stark-btn::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:8px;transition:background-color .2s,transform .1s}
+.screen-nav a,.contact>*,.content h2 a,.content h2 label,.stark-btn{position:relative;isolation:isolate}
+.screen-nav a::after,.contact>*::after,.content h2 a::after,.content h2 label::after,.stark-btn::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:8px;transition:background-color .2s,transform .1s}
 .screen-nav a:hover::after,.contact a:hover::after,.content h2 a:hover::after,.content h2 label:hover::after,.stark-btn:hover::after{background:rgba(10,10,10,.2)}
 .screen-nav a:active::after,.contact a:active::after,.content h2 a:active::after,.content h2 label:active::after,.stark-btn:active::after{background:rgba(10,10,10,.4);transform:scale(.94)}
-.screen-nav a.on::after{display:none}
 canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
 /* The frosted column behind the text: part of the page, since iOS draws nothing fixed under its address bar. */
 .pager main::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(var(--wrap),100%);background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);pointer-events:none}
 main{position:relative;z-index:1}
-main>section{position:relative;padding-bottom:var(--tail)}
-.hero{height:calc(100lvh + 120px);display:flex;align-items:center;justify-content:center}
+/* The gap keeps the next section out from under a see-through address bar. */
+.pager main{display:flex;flex-direction:column;gap:120px}
+main>section{position:relative;padding-bottom:var(--bar)}
+.hero{height:100lvh;display:flex;align-items:center;justify-content:center}
 .hero-title{font-weight:700;font-size:clamp(32px,8vw,80px);line-height:1;letter-spacing:.06em;text-align:center;margin:0}
-.screen-nav{position:absolute;top:24px;left:0;right:0;display:flex;justify-content:center;gap:16px;z-index:2}
-.screen-nav a,.screen-nav label{font-size:12px;line-height:1;padding:4px 8px}
-.screen-nav .on{cursor:default}
-.screen-nav .on span{font-weight:700}
-.contact{position:absolute;bottom:calc(24px + var(--tail));left:0;right:0;display:flex;justify-content:center;gap:24px;font-size:12px;z-index:2}
-.contact a,.contact span{line-height:1;padding:4px 8px}
-.content{min-height:calc(100lvh + 120px);display:flex}
+/* One row of numbers and one of links, frosted so the page can scroll behind them. */
+.screen-nav,.contact{position:fixed;left:0;right:0;z-index:2;width:fit-content;margin:0 auto;display:flex;gap:4px;font-size:12px;line-height:1}
+.screen-nav{top:20px}
+.contact{bottom:20px}
+.screen-nav a,.contact>*{padding:6px 12px}
+.screen-nav [aria-current]{font-weight:700}
+.content{min-height:100lvh;display:flex}
 .content-panel{margin:auto;width:100%;max-width:var(--wrap);padding:clamp(48px,8vh,80px) clamp(24px,6vh,40px)}
 .content h2{font-size:20px;font-weight:700;line-height:1.6;margin:32px 0 16px}
 .content h2 span{font-weight:400}
@@ -40,22 +40,16 @@ main>section{position:relative;padding-bottom:var(--tail)}
 @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
 html:has(>.pager){scroll-snap-type:y mandatory}
 .pager main>section{scroll-snap-align:start}
-.tall main>section{min-height:calc(100lvh + 120px);display:flex;flex-direction:column}
 /* A section taller than the window also snaps at its end. */
-main>section::after{content:"";position:absolute;bottom:var(--tail);left:0;right:0;height:100dvh;scroll-snap-align:end;scroll-snap-stop:always;pointer-events:none}
+main>section::after{content:"";position:absolute;bottom:var(--bar);left:0;right:0;height:100dvh;scroll-snap-align:end;scroll-snap-stop:always;pointer-events:none}
 main>#eds:has(#eds-show-main:checked)::after{scroll-snap-align:none}
-.tall .screen-nav,.tall .section-content,.tall .contact{flex-shrink:0}
-.tall .screen-nav{position:static;padding-top:24px}
-.tall .section-content{margin-block:auto}
-.tall .contact{position:static;padding-bottom:24px}
-.tall .content-panel{margin-block:0;margin-inline:auto}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 main>section:target .content-panel{animation:fadein .6s ease}
 .content .flat{list-style:none;margin:0 0 20px;padding:0;-webkit-user-select:text;user-select:text}
 .content .flat li{font-size:16px;line-height:1.6;margin-bottom:4px}
 .eds-radio{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-#eds .section-content{display:grid;margin-block:0 auto}
-#eds .content-panel{grid-area:1/1;align-self:start;display:none;opacity:0;transform:translateX(24px);transition:opacity .2s ease,transform .2s ease,display .2s allow-discrete}
+#eds .section-content{display:grid;width:100%}
+#eds .content-panel{grid-area:1/1;margin-block:0;display:none;opacity:0;transform:translateX(24px);transition:opacity .2s ease,transform .2s ease,display .2s allow-discrete}
 #eds .swap-main{transform:translateX(-24px)}
 #eds-show-main:checked ~ .section-content .swap-main,#eds-show-list:checked ~ .section-content .swap-list,#eds-show-decks:checked ~ .section-content .swap-decks{display:block;opacity:1;transform:none;transition-delay:.2s}
 @starting-style{#eds-show-main:checked ~ .section-content .swap-main{opacity:0;transform:translateX(-24px)}#eds-show-list:checked ~ .section-content .swap-list,#eds-show-decks:checked ~ .section-content .swap-decks{opacity:0;transform:translateX(24px)}}
@@ -104,6 +98,6 @@ main>section:target .content-panel{animation:fadein .6s ease}
 .view{position:fixed;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;padding:24px}
 .stark-stack{display:flex;flex-direction:column;gap:8px;width:min(320px,80vw)}
 .stark-btn{display:flex;align-items:center;justify-content:center;padding:16px 24px;font-size:16px;font-weight:700;letter-spacing:.16em;-webkit-touch-callout:none;-webkit-user-drag:none}
-.stark-btn::after{background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+.screen-nav a::after,.contact>*::after,.stark-btn::after{background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
 .stark-row{display:flex;gap:8px}
 .stark-row .stark-btn{flex:1;padding:8px 4px;font-size:12px}
