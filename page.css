@@ -39,7 +39,7 @@ main{position:relative;z-index:1}
 .content p{margin:0 0 20px}
 .content ul,.content ol{margin:0 0 20px;padding-left:24px}
 .content li{margin-bottom:12px}
-.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:64px}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .gallery img{width:100%;height:auto;display:block;border-radius:8px}
 @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
 html:has(>body.pager:not(.nest)){scroll-snap-type:y mandatory}
