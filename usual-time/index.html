@@ -4,28 +4,264 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>usual time — lplvlql</title>
-<meta name="description" content="usual time. Mono delay, Loop/Sample memory, and direct effects for Daisy Terrarium.">
-<link rel="stylesheet" href="page.css?v=26">
-<link rel="stylesheet" href="style.css">
+<meta name="description" content="usual time. A delay pedal for Daisy Terrarium.">
+<link rel="stylesheet" href="../page.css?v=54">
 </head>
 <body class="pager">
 <canvas id="bg-pedals" aria-hidden="true"></canvas>
 <div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero" id="top">
-<nav class="screen-nav" aria-label="Screens"><a href="#top" class="on" aria-label="usual time"><span>1</span></a><a href="#content" aria-label="info"><span>2</span></a></nav>
+    <nav class="screen-nav" aria-label="Screens">
+      <a href="#top" class="on" aria-current="location" aria-label="usual time"><span>1</span></a>
+      <a href="#roadmap" aria-label="roadmap"><span>2</span></a>
+      <a href="#pedal" aria-label="pedal"><span>3</span></a>
+    </nav>
     <h1 class="hero-title">usual<br>time</h1>
   </section>
+  <div class="bend" aria-hidden="true"></div>
 
-  <section class="content" id="content">
-<nav class="screen-nav" aria-label="Screens"><a href="#top" aria-label="usual time"><span>1</span></a><a href="#content" class="on" aria-label="info"><span>2</span></a></nav>
-  <div class="content-panel">
-    <p class="lede">A delay pedal with looping, sampling, pitch shifting, time stretching, modulation, and distortion.</p>
-    <p class="status">In development.</p>
-  </div>
+  <section class="content" id="roadmap">
+    <nav class="screen-nav" aria-label="Screens">
+      <a href="#top" aria-label="usual time"><span>1</span></a>
+      <a href="#roadmap" class="on" aria-current="location" aria-label="roadmap"><span>2</span></a>
+      <a href="#pedal" aria-label="pedal"><span>3</span></a>
+    </nav>
+    <div class="content-panel">
+      <h2>time <span>delays, reverse, live, phrase</span></h2>
+      <p class="status">complete</p>
+      <h2>feed <span>decay, diffusion, routing</span></h2>
+      <p class="status">complete</p>
+      <h2>speed <span>intervals, jump, wander</span></h2>
+      <p class="status">complete</p>
+      <h2>drift <span>am / fm, mod / env</span></h2>
+      <p class="status">in progress</p>
+      <h2>dirt <span>ana / ada</span></h2>
+      <p class="status">in progress</p>
+      <h2>grain <span>pitch / stretch, jump, wander</span></h2>
+      <p class="status">complete</p>
+      <h2>physical <span>production</span></h2>
+      <p class="status">planned</p>
+    </div>
   </section>
+  <div class="bend" aria-hidden="true"></div>
+
+  <section class="content" id="pedal">
+    <nav class="screen-nav" aria-label="Screens">
+      <a href="#top" aria-label="usual time"><span>1</span></a>
+      <a href="#roadmap" aria-label="roadmap"><span>2</span></a>
+      <a href="#pedal" class="on" aria-current="location" aria-label="pedal"><span>3</span></a>
+    </nav>
+    <div class="content-panel">
+    <div class="rig">
+    <svg class="pedal-map" viewBox="-2 -2 68 124" aria-label="usual time pedal">
+      <rect x="0" y="0" width="64" height="120" rx="4" class="body"/>
+      <g class="part knob" data-knob="time" role="slider" tabindex="0" aria-label="time" aria-valuemin="0" aria-valuemax="10" aria-valuenow="5"><g class="face"><circle cx="12" cy="16" r="6"/><g class="spin"><line x1="12" y1="16" x2="12" y2="11" class="pointer"/></g></g><circle class="dot" cx="4.5" cy="16" r="0.5"/><text x="12" y="26">time</text></g>
+      <g class="part knob" data-knob="feed" role="slider" tabindex="0" aria-label="feed" aria-valuemin="0" aria-valuemax="10" aria-valuenow="5"><g class="face"><circle cx="32" cy="16" r="6"/><g class="spin"><line x1="32" y1="16" x2="32" y2="11" class="pointer"/></g></g><circle class="dot" cx="24.5" cy="16" r="0.5"/><text x="32" y="26">feed</text></g>
+      <g class="part knob" data-knob="speed" role="slider" tabindex="0" aria-label="speed" aria-valuemin="0" aria-valuemax="10" aria-valuenow="5"><g class="face"><circle cx="52" cy="16" r="6"/><g class="spin"><line x1="52" y1="16" x2="52" y2="11" class="pointer"/></g></g><circle class="dot" cx="44.5" cy="16" r="0.5"/><text x="52" y="26">speed</text></g>
+      <g class="part knob" data-knob="drift" role="slider" tabindex="0" aria-label="drift" aria-valuemin="0" aria-valuemax="10" aria-valuenow="5"><g class="face"><circle cx="12" cy="40" r="6"/><g class="spin"><line x1="12" y1="40" x2="12" y2="35" class="pointer"/></g></g><circle class="dot" cx="4.5" cy="40" r="0.5"/><text x="12" y="50">drift</text></g>
+      <g class="part knob" data-knob="dirt" role="slider" tabindex="0" aria-label="dirt" aria-valuemin="0" aria-valuemax="10" aria-valuenow="5"><g class="face"><circle cx="32" cy="40" r="6"/><g class="spin"><line x1="32" y1="40" x2="32" y2="35" class="pointer"/></g></g><circle class="dot" cx="24.5" cy="40" r="0.5"/><text x="32" y="50">dirt</text></g>
+      <g class="part knob" data-knob="grain" role="slider" tabindex="0" aria-label="grain" aria-valuemin="0" aria-valuemax="10" aria-valuenow="5"><g class="face"><circle cx="52" cy="40" r="6"/><g class="spin"><line x1="52" y1="40" x2="52" y2="35" class="pointer"/></g></g><circle class="dot" cx="44.5" cy="40" r="0.5"/><text x="52" y="50">grain</text></g>
+      <g class="part toggle" data-toggle="dry" role="switch" tabindex="0" aria-label="dry or wet" aria-checked="true"><rect x="6" y="64" width="4" height="8" rx="2"/><circle class="dot" cx="4.5" cy="68" r="0.5"/><line x1="8" y1="68" x2="8" y2="62" class="lever"/><text x="8" y="60">dry</text><text x="8" y="78">wet</text></g>
+      <g class="part toggle" data-toggle="mod" role="switch" tabindex="0" aria-label="mod or env" aria-checked="true"><rect x="22" y="64" width="4" height="8" rx="2"/><circle class="dot" cx="20.5" cy="68" r="0.5"/><line x1="24" y1="68" x2="24" y2="62" class="lever"/><text x="24" y="60">mod</text><text x="24" y="78">env</text></g>
+      <g class="part toggle" data-toggle="voice" role="switch" tabindex="0" aria-label="ana or ada" aria-checked="true"><rect x="38" y="64" width="4" height="8" rx="2"/><circle class="dot" cx="36.5" cy="68" r="0.5"/><line x1="40" y1="68" x2="40" y2="62" class="lever"/><text x="40" y="60">ana</text><text x="40" y="78">ada</text></g>
+      <g class="part toggle" data-toggle="transport" role="switch" tabindex="0" aria-label="pitch or stretch" aria-checked="true"><rect x="54" y="64" width="4" height="8" rx="2"/><circle class="dot" cx="52.5" cy="68" r="0.5"/><line x1="56" y1="68" x2="56" y2="62" class="lever"/><text x="56" y="60">pitch</text><text x="56" y="78">stretch</text></g>
+      <circle class="led" id="left-led" cx="16" cy="88" r="2"/>
+      <circle class="led" id="right-led" cx="48" cy="88" r="2"/>
+      <g class="part foot" data-foot="left" role="button" tabindex="0" aria-label="loop or sample"><circle cx="16" cy="104" r="6"/><circle class="dot" cx="8.5" cy="104" r="0.5"/><circle cx="16" cy="104" r="4" class="cap"/><text x="16" y="114">loop / sample</text></g>
+      <g class="part foot" data-foot="right" role="button" tabindex="0" aria-label="on or off"><circle cx="48" cy="104" r="6"/><circle class="dot" cx="40.5" cy="104" r="0.5"/><circle cx="48" cy="104" r="4" class="cap"/><text x="48" y="114">on / off</text></g>
+    </svg>
+    <div class="flow">
+      <ol class="chain" id="chain" aria-label="signal chain" aria-live="polite"><li><b>input</b></li><li><b>output</b></li></ol>
+      <div class="group" id="delay"><span>delay</span></div>
+      <div class="loop" id="loop" hidden></div>
+    </div>
+    </div>
+    <p class="status" id="memory"></p>
+    </div>
+  </section>
+  <div class="bend" aria-hidden="true"></div>
 </main>
-<script src="script.js?v=4"></script>
-<script src="page.js?v=5"></script>
+<script src="../engine.js?v=4"></script>
+<script>
+// Background: stomp boxes — geometry only, the engine is shared.
+startBackground("bg-pedals", function (pts, rng, W, H) {
+
+  // A 125B enclosure in portrait at real scale (mm): 66 x 121 x 40,
+  // with six knobs, four mini toggles, two footswitches and their LEDs.
+  var PW = 66, PH = 121, PD = 40, i, j, k;
+  var hw = PW / 2, hh = PH / 2, hd = PD / 2;
+  function face(nx, ny, put) {
+    for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) {
+      put(-1 + (i + 0.5) * 2 / nx + (rng() - 0.5) * 0.04,
+          -1 + (j + 0.5) * 2 / ny + (rng() - 0.5) * 0.04);
+    }
+  }
+  face(6, 10, function (u, v) { pts.push([u * hw, v * hh, hd]); });  // top
+  face(3, 5, function (u, v) { pts.push([u * hw, v * hh, -hd]); });  // bottom
+  face(3, 10, function (u, v) { pts.push([-hw, v * hh, u * hd]); }); // sides
+  face(3, 10, function (u, v) { pts.push([hw, v * hh, u * hd]); });
+  face(6, 3, function (u, v) { pts.push([u * hw, -hh, v * hd]); });  // ends
+  face(6, 3, function (u, v) { pts.push([u * hw, hh, v * hd]); });
+  // Hollow dotted rings: knobs, footswitches and LEDs have no centre dot.
+  function ring(cx, cy, cz, r, n) {
+    for (k = 0; k < n; k++) {
+      var a = k / n * Math.PI * 2;
+      pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r, cz]);
+    }
+  }
+  for (var row = 0; row < 2; row++) for (var c = 0; c < 3; c++) {
+    var kx = -20 + c * 20, ky = -40 + row * 24;
+    ring(kx, ky, hd + 1, 6.3, 10);
+    ring(kx, ky, hd + 15, 5.4, 10);
+  }
+  for (var t = 0; t < 4; t++) {
+    for (var l = 0; l < 4; l++) pts.push([-24 + t * 16 + l * 1.6, 10 - l * 2.2, hd + l * 3.5]);
+  }
+  for (var f = 0; f < 2; f++) {
+    var fx = -16 + f * 32, fy = 40;
+    ring(fx, fy, hd + 2, 6, 10);
+    ring(fx, fy, hd + 18, 5.4, 10);
+    ring(fx, fy - 17, hd + 2, 2.5, 6);
+  }
+}
+, function (W, H) {
+  // Fixed field: population from world area and pedal spacing,
+  // positions from a seeded pool. Viewports crop; nothing regenerates.
+  var spots = scatterLayout(384, 64, 77);
+  var pedals = [];
+  for (var i = 0; i < spots.length; i++) {
+    pedals.push({
+      x: spots[i][0],
+      y: spots[i][1],
+      rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2,
+      sx: (Math.random() - 0.5) * 0.22, sy: (Math.random() - 0.5) * 0.18, sz: (Math.random() - 0.5) * 0.14,
+    });
+  }
+  return pedals;
+}
+, Math.sqrt(66 * 66 / 4 + 121 * 121 / 4 + 40 * 40 / 4));
+</script>
+<script>
+// Pedal model: the controls set a state and the chain blocks show the
+// signal path for it. Position names run left to right, noon in the middle.
+(function () {
+  var semis = ["wander down", "jump down", "−12 st", "−7 st", "−5 st", "1×", "+5 st", "+7 st", "+12 st", "jump up", "wander up"];
+  var POSITIONS = {
+    time: ["dynamic forward", "live", "25 ms", "50 ms", "125 ms", "250 ms", "375 ms", "500 ms", "1 s", "1 s reverse", "dynamic reverse"],
+    feed: ["dense diffusion", "loose diffusion", "slow fade", "medium fade", "fast fade", "one repeat", "fast fade", "medium fade", "slow fade", "loose diffusion", "dense diffusion"],
+    speed: semis,
+    mod: ["fast flutter", "flutter", "strong", "medium", "mild", "off", "mild", "medium", "strong", "flutter", "fast flutter"],
+    env: ["destabilize", "stabilize", "dive", "scoop", "bloom", "off", "bloom", "scoop", "dive", "stabilize", "destabilize"],
+    ana: ["failing supply", "brownout", "starve", "sag", "give", "off", "edge", "crunch", "fuzz", "misbias", "rectify"],
+    ada: ["clock stall", "clock slip", "crush", "crunch", "grain", "off", "edge", "overflow", "wrap", "fold", "bit fracture"],
+    pitch: semis,
+    stretch: ["wander down", "jump down", "2×", "3/2×", "4/3×", "1×", "3/4×", "2/3×", "1/2×", "jump up", "wander up"]
+  };
+  var knob = { time: 5, feed: 5, speed: 5, drift: 5, dirt: 5, grain: 5 };
+  var up = { dry: true, mod: true, voice: true, transport: true };
+  var on = false, memory = "";
+
+  // Blocks in signal order: [name, setting, active]. Knobs at noon stay in place, faded, as "off".
+  function chain() {
+    var k = knob, playing = memory === "loop playing" || memory === "overdubbing";
+    var sample = on && memory === "sample playing", live = (on || playing) && !sample;
+    function setting(id, names, prefix) { return k[id] === 5 ? "off" : prefix + names[k[id]]; }
+    return [
+      [sample ? "sample" : playing ? "loop" : "input", "", true],
+      ["drift", setting("drift", POSITIONS[up.mod ? "mod" : "env"], k.drift < 5 ? "am " : "fm "), live && k.drift !== 5],
+      ["dirt", setting("dirt", POSITIONS[up.voice ? "ana" : "ada"], up.voice ? "ana " : "ada "), live && k.dirt !== 5],
+      ["time", POSITIONS.time[k.time], live],
+      ["speed", setting("speed", POSITIONS.speed, ""), live && k.speed !== 5],
+      ["grain", setting("grain", POSITIONS[up.transport ? "pitch" : "stretch"], up.transport ? "pitch " : "stretch "), live && k.grain !== 5],
+      ["feed", POSITIONS.feed[k.feed], live],
+      ["mix", on || playing ? (up.dry ? "dry + wet" : "wet") : "bypass", true],
+      ["output", "", true]
+    ];
+  }
+  function render() {
+    var blocks = chain(), settings = {};
+    blocks.forEach(function (b) { settings[b[0]] = b[1]; });
+    each(".pedal-map .knob", function (el) {
+      var id = el.getAttribute("data-knob"), c = el.querySelector("circle");
+      el.querySelector(".spin").setAttribute("transform", "rotate(" + (knob[id] - 5) * 27 + " " + c.getAttribute("cx") + " " + c.getAttribute("cy") + ")");
+      el.setAttribute("aria-valuenow", knob[id]);
+      el.setAttribute("aria-valuetext", settings[id]);
+    });
+    each(".pedal-map .toggle", function (el) {
+      var id = el.getAttribute("data-toggle");
+      el.querySelector(".lever").setAttribute("y2", up[id] ? 62 : 74);
+      el.setAttribute("aria-checked", up[id]);
+    });
+    document.getElementById("right-led").classList.toggle("lit", on);
+    var led = document.getElementById("left-led");
+    led.classList.toggle("blink", / recording$/.test(memory));
+    led.classList.toggle("lit", / playing$|overdubbing/.test(memory));
+    var list = document.getElementById("chain");
+    list.innerHTML = blocks.map(function (b) {
+      var cls = (b[2] ? "" : "off") + (/^(speed|grain|time|feed)$/.test(b[0]) ? " in-delay" : "");
+      return '<li class="' + cls.trim() + '"><b>' + b[0] + '</b>' + (b[1] ? '<span>' + b[1] + '</span>' : '') + '</li>';
+    }).join("");
+    // Time, speed, grain and feed are one stage: the delay's reader and its feedback, outlined together.
+    var group = document.getElementById("delay"), first = list.children[3], last = list.children[6];
+    group.style.top = first.offsetTop - 6 + "px";
+    group.style.height = last.offsetTop + last.offsetHeight - first.offsetTop + 12 + "px";
+    group.classList.toggle("off", !blocks[3][2]);
+    // Feed loop: regenerative repeats leave the delay and re-enter at drift;
+    // source-preserving repeats return raw history to the delay's input, ahead of its reader.
+    var loop = document.getElementById("loop");
+    loop.hidden = knob.feed === 5;
+    loop.classList.toggle("off", !blocks[6][2]);
+    if (!loop.hidden) {
+      var from = list.children[knob.feed < 5 ? 1 : 3], to = list.children[6];
+      loop.style.top = from.offsetTop + from.offsetHeight / 2 + "px";
+      loop.style.height = to.offsetTop - from.offsetTop + "px";
+    }
+    document.getElementById("memory").textContent = memory;
+  }
+  function each(selector, fn) { Array.prototype.forEach.call(document.querySelectorAll(selector), fn); }
+  function turn(id, step) { knob[id] = Math.max(0, Math.min(10, knob[id] + step)); render(); }
+  function press(id) {
+    if (id === "right") { if (memory) memory = ""; else on = !on; }
+    else if (on) memory = memory === "sample recording" ? "sample playing" : "sample recording";
+    else memory = { "": "loop recording", "loop recording": "loop playing", "loop playing": "overdubbing", "overdubbing": "loop playing" }[memory] || "loop recording";
+    render();
+  }
+  // The drawing is a control surface: wheel and trackpad scrolling over it never move the page.
+  document.querySelector(".pedal-map").addEventListener("wheel", function (e) { e.preventDefault(); }, { passive: false });
+  // Knobs turn by dragging: up or right is clockwise, one position per 12px.
+  each(".pedal-map .knob", function (el) {
+    var id = el.getAttribute("data-knob"), start = null;
+    el.addEventListener("pointerdown", function (e) {
+      start = { x: e.clientX, y: e.clientY, value: knob[id] };
+      el.setPointerCapture(e.pointerId);
+    });
+    el.addEventListener("pointermove", function (e) {
+      if (!start) return;
+      var value = Math.max(0, Math.min(10, start.value + Math.round((e.clientX - start.x - e.clientY + start.y) / 12)));
+      if (value !== knob[id]) { knob[id] = value; render(); }
+    });
+    el.addEventListener("pointerup", function () { start = null; });
+    el.addEventListener("pointercancel", function () { start = null; });
+    el.addEventListener("keydown", function (e) {
+      var step = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
+      if (step) { e.preventDefault(); turn(id, step); }
+    });
+  });
+  // Toggles and footswitches act on click, Enter or Space.
+  function pressable(selector, act) {
+    each(selector, function (el) {
+      el.addEventListener("click", function () { act(el); });
+      el.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(el); }
+      });
+    });
+  }
+  pressable(".pedal-map .toggle", function (el) { var id = el.getAttribute("data-toggle"); up[id] = !up[id]; render(); });
+  pressable(".pedal-map .foot", function (el) { press(el.getAttribute("data-foot")); });
+  render();
+})();
+</script>
+<script src="../page.js?v=14"></script>
 </body>
 </html>
