@@ -4,27 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>lplvlql</title>
-<meta name="description" content="chronicle, duel archives, ledger, desk, pocket, poker, mister tidy, usual time.">
-<link rel="stylesheet" href="style.css?v=98">
+<meta name="description" content="chronicle, duel archives, ledger, desk, pocket, poker, mister tidy, usual time">
+<link rel="stylesheet" href="page.css?v=59">
 </head>
 <body class="stark">
   <canvas id="bg-canvas" class="bg-canvas" aria-hidden="true"></canvas>
 
   <main class="view" aria-label="Projects">
     <nav class="stark-stack">
-      <a class="stark-btn" href="chronicle/"><span class="stark-name">chronicle</span></a>
-      <a class="stark-btn" href="duel-archives/"><span class="stark-name">duel archives</span></a>
-      <a class="stark-btn" href="ledger/"><span class="stark-name">ledger</span></a>
+      <a class="stark-btn" href="chronicle/">chronicle</a>
+      <a class="stark-btn" href="duel-archives/">duel archives</a>
+      <a class="stark-btn" href="ledger/">ledger</a>
       <div class="stark-row">
-        <a class="stark-btn" href="desk/"><span class="stark-name">desk</span></a>
-        <a class="stark-btn" href="pocket/"><span class="stark-name">pocket</span></a>
-        <a class="stark-btn" href="poker/"><span class="stark-name">poker</span></a>
+        <a class="stark-btn" href="desk/">desk</a>
+        <a class="stark-btn" href="pocket/">pocket</a>
+        <a class="stark-btn" href="poker/">poker</a>
       </div>
-      <a class="stark-btn" href="mister-tidy/"><span class="stark-name">mister tidy</span></a>
-      <a class="stark-btn" href="usual-time/"><span class="stark-name">usual time</span></a>
+      <a class="stark-btn" href="mister-tidy/">mister tidy</a>
+      <a class="stark-btn" href="usual-time/">usual time</a>
     </nav>
   </main>
 
-<script src="script.js?v=94"></script>
+<script src="engine.js?v=11"></script>
+<script>
+// Background: one sphere of connected points — geometry only, the engine is shared.
+startBackground("bg-canvas", function (pts, rng, W, H) {
+  // A Fibonacci sphere with seeded jitter: irregular but evenly spread.
+  var Y = 3000, R = Math.min(W, H) * 0.375;
+  for (var i = 0; i < Y; i++) {
+    var y = 1 - (i + 0.5) / Y * 2, r = Math.sqrt(Math.max(0, 1 - y * y)), t = i * 2.4;
+    var x = Math.cos(t) * r + (rng() - 0.5) * 0.03, z = Math.sin(t) * r + (rng() - 0.5) * 0.03;
+    var l = Math.sqrt(x * x + y * y + z * z);
+    pts.push([x / l * R, y / l * R, z / l * R]);
+  }
+}
+, function (W, H) {
+  // One home at the centre, tilted 15 degrees, a full turn every 150 s.
+  return [{ x: 0.5, y: 0.5, rx: Math.PI / 12, ry: 0, rz: 0, sx: 0, sy: Math.PI * 2 / 150, sz: 0 }];
+}
+, Math.min(innerWidth, innerHeight) * 0.375);
+</script>
 </body>
 </html>

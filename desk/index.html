@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ledger desk — lplvlql</title>
-<meta name="description" content="ledger desk. A desktop app for sharing files directly between computers, built on Ledger.">
-<link rel="stylesheet" href="../page.css?v=55">
+<meta name="description" content="ledger desk">
+<link rel="stylesheet" href="../page.css?v=59">
 </head>
 <body class="pager">
-<canvas id="bg-parcels" aria-hidden="true"></canvas>
+<canvas id="bg-cubes" aria-hidden="true"></canvas>
 <div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero" id="top">
@@ -26,58 +26,29 @@
   </section>
 <div class="bend" aria-hidden="true"></div>
 </main>
-<script src="../engine.js?v=4"></script>
+<script src="../engine.js?v=11"></script>
 <script>
-// Background: parcels — geometry only, the engine is shared.
-startBackground("bg-parcels", function (pts, rng, W, H) {
-
-  // One parcel as dot homes: an open-top box — dotted bottom and
-  // four sides, no top face, with four short flaps angled outward
-  // from the top edges. Reads as a parcel, not a die.
-  var W2 = 42, D2 = 42, H = 48, FL = 32, FA = 0.9, G = 7, GH = 8, GF = 3;
-  var i, j, ac, ht, fc, ft, ox, oz, fj;
-  for (i = 0; i < G; i++) for (j = 0; j < G; j++) { // bottom
-    ac = -W2 + (i + 0.5) * 2 * W2 / G + (rng() - 0.5) * 2;
-    ht = -D2 + (j + 0.5) * 2 * D2 / G + (rng() - 0.5) * 2;
-    pts.push([ac, ht, -H / 2]);
-  }
-  for (i = 0; i < G; i++) for (j = 0; j < GH; j++) { // four sides
-    ac = (i + 0.5) / G * 2 - 1;
-    ht = -H / 2 + (j + 0.5) / GH * H + (rng() - 0.5) * 2;
-    fj = (rng() - 0.5) * 2;
-    pts.push([W2, ac * D2 + fj, ht]);
-    pts.push([-W2, ac * D2 + fj, ht]);
-    pts.push([ac * W2 + fj, D2, ht]);
-    pts.push([ac * W2 + fj, -D2, ht]);
-  }
-  var co = Math.cos(FA), si = Math.sin(FA);
-  for (i = 0; i < G; i++) for (j = 0; j < GF; j++) { // four flaps
-    fc = (i + 0.5) / G * 2 - 1;
-    ft = (j + 0.5) / GF * FL;
-    ox = W2 + ft * si; oz = H / 2 + ft * co;
-    fj = (rng() - 0.5) * 2;
-    pts.push([ox, fc * D2 + fj, oz]);
-    pts.push([-ox, fc * D2 + fj, oz]);
-    pts.push([fc * W2 + fj, ox, oz]);
-    pts.push([fc * W2 + fj, -ox, oz]);
-  }
+// Background: one cube — geometry only, the engine is shared.
+startBackground("bg-cubes", function (pts, rng, W, H) {
+  // One cube: the full-size block of the ledger family.
+  dotCube(pts, rng, 0, 0, 0, 32, 7);
 }
 , function (W, H) {
-  // Fixed field: population from world area and parcel spacing,
+  // Fixed field: population from world area and spacing,
   // positions from a seeded pool. Viewports crop; nothing regenerates.
   var spots = scatterLayout(336, 64, 44);
-  var cards = [];
+  var homes = [];
   for (var i = 0; i < spots.length; i++) {
-    cards.push({
+    homes.push({
       x: spots[i][0],
       y: spots[i][1],
       rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2,
       sx: (Math.random() - 0.5) * 0.25, sy: (Math.random() - 0.5) * 0.2, sz: (Math.random() - 0.5) * 0.15
     });
   }
-  return cards;
+  return homes;
 }
-, 96);
+, Math.sqrt(3) * 32);
 </script>
 
 <script src="../page.js?v=14"></script>
