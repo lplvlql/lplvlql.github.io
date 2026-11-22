@@ -1,6 +1,6 @@
 // Shared background engine: one cloud of permanent dot homes, dynamic
 // proximity lines recomputed every frame, and a shifting viewpoint:
-// the cursor (or device tilt) moves the camera, so every shape is seen
+// touch, scroll, keys or the cursor move the camera, so every shape is seen
 // from a new angle and nearer homes drift further than distant ones;
 // while it moves, dots shimmer between nearby positions.
 // Pages supply homes and a build function that fills pts and returns the
@@ -70,7 +70,7 @@ function startBackground(homes, build, link) {
     draw();
   }
 
-  // Viewpoint: target from cursor or tilt in [-1, 1], eased without overshoot.
+  // Viewpoint: target in [-1, 1], eased without overshoot.
   var viewX = 0, viewY = 0, viewTX = 0, viewTY = 0;
   var VIEW = 0.5, PARALLAX = 48; // max view turn (radians) and drift (px)
   var SHIMMER = 6; // px a dot may hop while the view is moving
@@ -187,24 +187,13 @@ function startBackground(homes, build, link) {
   resize();
   if (reduceMotion) return;
 
-  // Pointer and tilt both aim the viewpoint.
-  addEventListener("pointermove", function (e) { viewTX = e.clientX / W * 2 - 1; viewTY = e.clientY / H * 2 - 1; });
-  // Tilt: iOS grants motion access only after a tap; the first reading
-  // is the neutral hold, so tilting from wherever you hold the phone aims it.
-  var askedOrientation = false, tilt0 = null;
-  addEventListener("click", function (e) {
-    if (askedOrientation || e.target.closest("a, [role]")) return;
-    askedOrientation = true;
-    if (window.DeviceOrientationEvent && DeviceOrientationEvent.requestPermission) {
-      DeviceOrientationEvent.requestPermission().catch(function () {});
-    }
-  });
-  addEventListener("deviceorientation", function (e) {
-    if (e.gamma === null || e.beta === null) return;
-    if (!tilt0) tilt0 = [e.gamma, e.beta];
-    viewTX = Math.max(-1, Math.min(1, (e.gamma - tilt0[0]) / 30));
-    viewTY = Math.max(-1, Math.min(1, (e.beta - tilt0[1]) / 30));
-  });
+  // Every interaction moves the viewpoint: pointers aim it, scrolling
+  // rocks it, and each key press turns it somewhere new.
+  function aim(e) { viewTX = e.clientX / W * 2 - 1; viewTY = e.clientY / H * 2 - 1; }
+  addEventListener("pointermove", aim);
+  addEventListener("pointerdown", aim);
+  addEventListener("scroll", function () { viewTY = Math.sin(scrollY / H * 2); });
+  addEventListener("keydown", function () { viewTX = Math.random() * 2 - 1; viewTY = Math.random() * 2 - 1; });
 
   function frame(now) {
     var dt = lastFrame === null ? 16 : Math.min(50, now - lastFrame);

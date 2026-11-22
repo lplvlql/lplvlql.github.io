@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>lplvlql</title>
 <meta name="description" content="chronicle, duel archives, ledger, desk, pocket, poker, mister tidy, usual time">
-<link rel="stylesheet" href="page.css?v=61">
+<link rel="stylesheet" href="page.css?v=62">
 </head>
 <body class="stark">
 
@@ -24,14 +24,15 @@
     </nav>
   </main>
 
-<script src="engine.js?v=13"></script>
+<script src="engine.js?v=14"></script>
 <script>
 // Background: one sphere of connected points
 // One home at the centre, tilted 15 degrees, a full turn every 150 s.
 startBackground([{ x: 0.5, y: 0.5, rx: Math.PI / 12, ry: 0, rz: 0, sx: 0, sy: Math.PI * 2 / 150, sz: 0 }], function (pts, rng) {
   // A Fibonacci sphere with seeded jitter: irregular but evenly spread.
-  // 90% of the window's shorter side, with evenly spaced dots up to 3000.
-  var R = Math.min(innerWidth, innerHeight) * 0.45, Y = Math.min(3000, Math.round(R * R / 38));
+  // Just wide enough to hold the buttons, with evenly spaced dots.
+  var buttons = document.querySelector("nav");
+  var R = Math.hypot(buttons.offsetWidth, buttons.offsetHeight) / 2, Y = Math.round(R * R / 38);
   for (var i = 0; i < Y; i++) {
     var y = 1 - (i + 0.5) / Y * 2, r = Math.sqrt(Math.max(0, 1 - y * y)), t = i * 2.4;
     var x = Math.cos(t) * r + (rng() - 0.5) * 0.03, z = Math.sin(t) * r + (rng() - 0.5) * 0.03;
