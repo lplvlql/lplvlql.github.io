@@ -5,16 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>chronicle — lplvlql</title>
 <meta name="description" content="a drafting card game">
-<link rel="stylesheet" href="../page.css?v=60">
+<link rel="stylesheet" href="../page.css?v=61">
 </head>
 <body class="pager">
-<canvas id="bg-cards" aria-hidden="true"></canvas>
-<div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero" id="top" data-label="chronicle">
     <h1 class="hero-title">chronicle</h1>
   </section>
-<div class="bend" aria-hidden="true"></div>
 
   <section class="content" id="development" data-label="development">
   <div class="content-panel">
@@ -28,7 +25,6 @@
     <p class="status">planned</p>
   </div>
   </section>
-<div class="bend" aria-hidden="true"></div>
 
   <section class="content" id="design" data-label="game design">
   <div class="content-panel">
@@ -49,7 +45,6 @@
     <h2>scoring <span>highest chronicle wins</span></h2>
   </div>
   </section>
-<div class="bend" aria-hidden="true"></div>
 
   <section class="content" id="artwork" data-label="artwork">
   <div class="content-panel">
@@ -63,24 +58,23 @@
     </div>
   </div>
   </section>
-<div class="bend" aria-hidden="true"></div>
 </main>
-<script src="../page.js?v=15"></script>
-<script src="../engine.js?v=12"></script>
+<script src="../page.js?v=16"></script>
+<script src="../engine.js?v=13"></script>
 <script>
-// Background: dotted cards — geometry only, the engine is shared.
-startBackground("bg-cards", function (pts, rng, W, H) {
+// Background: dotted cards
+startBackground(scatterHomes(256), function (pts, rng) {
   var CW = 92, CH = 138;
   var nx = 8, ny = 12, i, j;
   for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) {
     pts.push([
       -CW / 2 + (i + 0.5) * CW / nx + (rng() - 0.5) * 5,
-      -CH / 2 + (j + 0.5) * CH / ny + (rng() - 0.5) * 5
+      -CH / 2 + (j + 0.5) * CH / ny + (rng() - 0.5) * 5,
+      0
     ]);
   }
-}
-, function () { return scatterHomes(256, 11); }
-, Math.sqrt(92 * 92 / 4 + 138 * 138 / 4));
+  return Math.sqrt(92 * 92 / 4 + 138 * 138 / 4);
+});
 </script>
 </body>
 </html>

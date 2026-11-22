@@ -5,16 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ledger pocket — lplvlql</title>
 <meta name="description" content="ledger pocket">
-<link rel="stylesheet" href="../page.css?v=60">
+<link rel="stylesheet" href="../page.css?v=61">
 </head>
 <body class="pager">
-<canvas id="bg-pocket" aria-hidden="true"></canvas>
-<div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero" id="top" data-label="ledger pocket">
     <h1 class="hero-title">ledger<br>pocket</h1>
   </section>
-<div class="bend" aria-hidden="true"></div>
 
   <section class="content" id="roadmap" data-label="roadmap">
   <div class="content-panel">
@@ -24,19 +21,14 @@
     <p class="status">planned</p>
   </div>
   </section>
-<div class="bend" aria-hidden="true"></div>
 </main>
-<script src="../engine.js?v=12"></script>
+<script src="../page.js?v=16"></script>
+<script src="../engine.js?v=13"></script>
 <script>
-// Background: small cubes — geometry only, the engine is shared.
-startBackground("bg-pocket", function (pts, rng, W, H) {
-  // Small cubes: pocket-sized blocks of the ledger family.
-  dotCube(pts, rng, 0, 0, 0, 16, 4);
-}
-, function () { return scatterHomes(224, 55); }
-, Math.sqrt(3) * 16);
+// Background: small cubes
+startBackground(scatterHomes(224), function (pts, rng) {
+  return dotCube(pts, rng, 16, 4);
+});
 </script>
-
-<script src="../page.js?v=15"></script>
 </body>
 </html>

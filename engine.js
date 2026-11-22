@@ -3,68 +3,43 @@
 // the cursor (or device tilt) moves the camera, so every shape is seen
 // from a new angle and nearer homes drift further than distant ones;
 // while it moves, dots shimmer between nearby positions.
-// Pages supply only geometry: build fills pts, place returns homes;
-// an optional link distance joins nearby homes with dotted lines.
-// Fixed world: one seeded minimum-distance pool per page, sized for a
-// 2560x1440 field. Viewports crop the field; viewports never reshape
-// it. No grids, no regeneration.
+// Pages supply homes and a build function that fills pts and returns the
+// shape's radius; an optional link distance joins nearby homes with dotted lines.
+// Fixed world: homes are scattered once per load over a 2560x1440 field
+// that viewports crop.
 var WORLD_W = 2560, WORLD_H = 1440;
-var FIELD_SEED = (Math.random() * 4294967296) | 0; // fresh field every load, stable within it
-function scatterLayout(minDist, max, salt) {
-  "use strict";
-  var seed = (FIELD_SEED + salt) | 0;
-  function rnd() {
-    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
-    var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
-    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  }
-  var r2 = (minDist / WORLD_W) * (minDist / WORLD_W);
-  var pool = [], guard = 0;
-  while (pool.length < max && guard < max * 400) {
-    guard++;
-    var cx = rnd(), cy = rnd(), ok = true;
-    for (var i = 0; i < pool.length; i++) {
-      var dx = cx - pool[i][0], dy = cy - pool[i][1];
-      if (dx * dx + dy * dy < r2) { ok = false; break; }
-    }
-    if (ok) pool.push([cx, cy]);
-  }
-  while (pool.length < max) pool.push([rnd(), rnd()]);
-  return pool.slice(0, Math.min(max, Math.round(WORLD_W * WORLD_H / (minDist * minDist))));
-}
-// Homes for a page: positions from the seeded pool, each with a random
-// starting angle and slow spin. Pages pick only spacing and a seed.
-function scatterHomes(minDist, salt) {
-  "use strict";
-  return scatterLayout(minDist, 64, salt).map(function (p) {
-    return {
-      x: p[0], y: p[1],
+// Homes at least minDist apart, each with a random starting angle and slow spin.
+function scatterHomes(minDist) {
+  var homes = [], count = Math.min(64, Math.round(WORLD_W * WORLD_H / (minDist * minDist)));
+  while (homes.length < count) {
+    var x = Math.random(), y = Math.random();
+    if (homes.some(function (h) { return Math.hypot(x - h.x, y - h.y) < minDist / WORLD_W; })) continue;
+    homes.push({
+      x: x, y: y,
       rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2,
       sx: (Math.random() - 0.5) * 0.25, sy: (Math.random() - 0.5) * 0.2, sz: (Math.random() - 0.5) * 0.15
-    };
-  });
+    });
+  }
+  return homes;
 }
-// A dotted cube: grid x grid dots on each of six faces, centred at
-// (cx, cy, cz) with half-size h. Shared by the ledger family of pages.
-function dotCube(pts, rng, cx, cy, cz, h, grid) {
-  "use strict";
+// A dotted cube: grid x grid dots on each of six faces, half-size h.
+// Shared by the ledger family of pages.
+function dotCube(pts, rng, h, grid) {
   for (var i = 0; i < grid; i++) for (var j = 0; j < grid; j++) {
     var a = -h + (i + 0.5) * 2 * h / grid + (rng() - 0.5) * 2;
     var b = -h + (j + 0.5) * 2 * h / grid + (rng() - 0.5) * 2;
-    pts.push([cx + h, cy + a, cz + b]); pts.push([cx - h, cy + a, cz + b]);
-    pts.push([cx + a, cy + h, cz + b]); pts.push([cx + a, cy - h, cz + b]);
-    pts.push([cx + a, cy + b, cz + h]); pts.push([cx + a, cy + b, cz - h]);
+    pts.push([h, a, b], [-h, a, b], [a, h, b], [a, -h, b], [a, b, h], [a, b, -h]);
   }
+  return Math.sqrt(3) * h;
 }
-function startBackground(canvasId, build, place, maxz, link) {
+function startBackground(homes, build, link) {
   "use strict";
-  var canvas = document.getElementById(canvasId);
-  if (!canvas || !canvas.getContext) return;
+  var canvas = document.createElement("canvas");
+  canvas.setAttribute("aria-hidden", "true");
+  document.body.prepend(canvas);
   var ctx = canvas.getContext("2d");
-  if (!ctx) return;
-  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var W = 0, H = 0, lastFrame = null;
+  var reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var W, H, lastFrame = null;
 
   // Seeded RNG: geometry is identical on every load.
   function mulberry(seed) {
@@ -75,51 +50,25 @@ function startBackground(canvasId, build, place, maxz, link) {
       return ((t ^ t >>> 14) >>> 0) / 4294967296;
     };
   }
-  var rng = mulberry(42);
 
+  var pts, activeN;
+  var bx, by, sf; // projected dots and their opacity
+  var MAXZ; // farthest dot from the home centre
+  var CAM; // camera distance: gentle perspective at any size
   function resize() {
-    var dpr = Math.min(2, window.devicePixelRatio || 1);
-    var w = window.innerWidth, h = window.innerHeight;
-    if (W && Math.abs(w - W) < 2 && Math.abs(h - H) < 2) return; // ignore URL-bar wobble
-    W = w; H = h;
+    var dpr = Math.min(2, devicePixelRatio);
+    W = innerWidth; H = innerHeight;
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    scheduleLayout();
-  }
-  var layoutTimer = null;
-  function scheduleLayout() {
-    if (layoutTimer) clearTimeout(layoutTimer);
-    layoutTimer = setTimeout(layout, 150);
-  }
-  window.addEventListener("resize", resize); // the loop repaints
-
-  // Layout owns the population: rebuild on viewport change, keeping
-  // survivors' spins so nothing jumps. Positions are a stable prefix
-  // of the seeded pool, so survivors never move.
-  var pts = [], homes = [], N = 0, activeN = 0;
-  var bx = new Float32Array(0), by = new Float32Array(0); // projected dots
-  var sf = new Float32Array(0);
-  var MAXZ = maxz; // farthest dot from the home centre
-  var CAM = Math.max(400, MAXZ * 4); // camera distance: gentle perspective at any size
-  function layout() {
-    layoutTimer = null;
-    rng = mulberry(42);
     pts = [];
-    build(pts, rng, W, H);
-    var fresh = place(W, H);
-    for (var i = 0; i < fresh.length && i < homes.length; i++) {
-      fresh[i].rx = homes[i].rx; fresh[i].ry = homes[i].ry; fresh[i].rz = homes[i].rz;
-      fresh[i].sx = homes[i].sx; fresh[i].sy = homes[i].sy; fresh[i].sz = homes[i].sz;
-    }
-    homes = fresh;
-    N = homes.length * pts.length;
-    bx = new Float32Array(N); by = new Float32Array(N);
-    sf = new Float32Array(N);
+    MAXZ = build(pts, mulberry(42));
+    CAM = Math.max(400, MAXZ * 4);
+    var n = homes.length * pts.length;
+    bx = new Float32Array(n); by = new Float32Array(n); sf = new Float32Array(n);
+    project();
+    draw();
   }
-  resize();
-  layout();
-  if (layoutTimer) { clearTimeout(layoutTimer); layoutTimer = null; }
 
   // Viewpoint: target from cursor or tilt in [-1, 1], eased without overshoot.
   var viewX = 0, viewY = 0, viewTX = 0, viewTY = 0;
@@ -128,8 +77,9 @@ function startBackground(canvasId, build, place, maxz, link) {
 
   var centres = []; // visible homes on screen, for optional links
   function hop(n, k) { var h = Math.sin(n * 12.9898 + k * 78.233) * 43758.5453; return h - Math.floor(h) - 0.5; }
-  function project(t) {
-    var n = 0;
+  var animNow = 2989; // fixed starting moment, so first frames match every load
+  function project() {
+    var n = 0, t = animNow;
     centres = [];
     // Shimmer: while the view glides, dots hop between nearby positions;
     // it fades to nothing as the view settles.
@@ -146,7 +96,7 @@ function startBackground(canvasId, build, place, maxz, link) {
       var cax = Math.cos(ax), sax = Math.sin(ax), cay = Math.cos(ay), say = Math.sin(ay), caz = Math.cos(az), saz = Math.sin(az);
       var cvy = Math.cos(viewX * VIEW), svy = Math.sin(viewX * VIEW), cvx = Math.cos(viewY * VIEW), svx = Math.sin(viewY * VIEW);
       for (var i = 0; i < pts.length; i++, n++) {
-        var lx = pts[i][0], ly = pts[i][1], lz = pts[i][2] || 0;
+        var lx = pts[i][0], ly = pts[i][1], lz = pts[i][2];
         var y1 = ly * cax - lz * sax, z1 = ly * sax + lz * cax;
         var x2 = lx * cay + z1 * say, z2 = z1 * cay - lx * say;
         var x3 = x2 * caz - y1 * saz, y3 = x2 * saz + y1 * caz;
@@ -232,37 +182,39 @@ function startBackground(canvasId, build, place, maxz, link) {
     ctx.globalAlpha = 1;
   }
 
+  // Reduced motion: one still picture, redrawn only on resize.
+  addEventListener("resize", resize);
+  resize();
+  if (reduceMotion) return;
+
   // Pointer and tilt both aim the viewpoint.
-  function aim(x, y) { viewTX = x / W * 2 - 1; viewTY = y / H * 2 - 1; }
-  window.addEventListener("pointermove", function (e) { aim(e.clientX, e.clientY); });
+  addEventListener("pointermove", function (e) { viewTX = e.clientX / W * 2 - 1; viewTY = e.clientY / H * 2 - 1; });
   // Tilt: iOS grants motion access only after a tap; the first reading
   // is the neutral hold, so tilting from wherever you hold the phone aims it.
   var askedOrientation = false, tilt0 = null;
-  window.addEventListener("click", function (e) {
-    if (askedOrientation || (e.target && e.target.closest && e.target.closest("a, button, [role]"))) return;
+  addEventListener("click", function (e) {
+    if (askedOrientation || e.target.closest("a, [role]")) return;
     askedOrientation = true;
-    if (window.DeviceOrientationEvent && typeof window.DeviceOrientationEvent.requestPermission === "function") {
-      window.DeviceOrientationEvent.requestPermission().catch(function () {});
+    if (window.DeviceOrientationEvent && DeviceOrientationEvent.requestPermission) {
+      DeviceOrientationEvent.requestPermission().catch(function () {});
     }
   });
-  window.addEventListener("deviceorientation", function (e) {
+  addEventListener("deviceorientation", function (e) {
     if (e.gamma === null || e.beta === null) return;
     if (!tilt0) tilt0 = [e.gamma, e.beta];
     viewTX = Math.max(-1, Math.min(1, (e.gamma - tilt0[0]) / 30));
     viewTY = Math.max(-1, Math.min(1, (e.beta - tilt0[1]) / 30));
   });
 
-  var animNow = 2989; // fixed starting moment, so first frames match every load
   function frame(now) {
     var dt = lastFrame === null ? 16 : Math.min(50, now - lastFrame);
     lastFrame = now;
-    var adt = reduceMotion ? 0 : dt; // reduced motion is this delta being zero
-    animNow += adt;
-    var ease = 1 - Math.exp(-adt / 300); // reduced motion holds the view still
+    animNow += dt;
+    var ease = 1 - Math.exp(-dt / 300);
     viewX += (viewTX - viewX) * ease; viewY += (viewTY - viewY) * ease;
-    project(animNow);
+    project();
     draw();
-    window.requestAnimationFrame(frame);
+    requestAnimationFrame(frame);
   }
-  window.requestAnimationFrame(frame);
+  requestAnimationFrame(frame);
 }

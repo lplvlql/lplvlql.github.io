@@ -1,9 +1,8 @@
-/* Shared subpage styles: every subpage. One source of truth. */
 :root{--ink:rgba(10,10,10,.8);--wrap:720px;--frost:rgba(255,255,255,.2);--blur:blur(6px)}
 *{box-sizing:border-box}
 body{margin:0;-webkit-user-select:none;user-select:none;background:#fff;color:var(--ink);font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;-webkit-font-smoothing:antialiased}
 a{color:var(--ink);text-decoration:none}
-a::before,button::before,label[for]::before{content:"";display:inline-block;width:4px;height:4px;margin-right:4px;border-radius:50%;background:currentColor;vertical-align:middle}
+a::before,label::before{content:"";display:inline-block;width:4px;height:4px;margin-right:4px;border-radius:50%;background:currentColor;vertical-align:middle}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 /* Link pill: hover shades it, press darkens and shrinks it; the text never moves. */
 .screen-nav a,.contact a,.content h2 a,.content h2 label,.stark-btn{position:relative;isolation:isolate}
@@ -11,65 +10,55 @@ a::before,button::before,label[for]::before{content:"";display:inline-block;widt
 .screen-nav a:hover::after,.contact a:hover::after,.content h2 a:hover::after,.content h2 label:hover::after,.stark-btn:hover::after{background:rgba(10,10,10,.2)}
 .screen-nav a:active::after,.contact a:active::after,.content h2 a:active::after,.content h2 label:active::after,.stark-btn:active::after{background:rgba(10,10,10,.4);transform:scale(.94)}
 .screen-nav a.on::after{display:none}
-#bg-cards,#bg-pyramids,#bg-peers,#bg-chips,#bg-cubes,#bg-pocket,#bg-sdcards,#bg-pedals{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-.page-column{position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(var(--wrap),100%);background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);pointer-events:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+/* The frosted column behind the text. */
+.pager::after{content:"";position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(var(--wrap),100%);background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);pointer-events:none}
 main{position:relative;z-index:1}
-.hero{height:100svh;display:flex;align-items:center;justify-content:center;position:relative}
+main>section{position:relative}
+.hero{height:100svh;display:flex;align-items:center;justify-content:center}
 .hero-title{font-weight:700;font-size:clamp(32px,8vw,80px);line-height:1;letter-spacing:.06em;text-align:center;margin:0}
-.screen-nav{position:absolute;top:24px;left:0;right:0;display:flex;flex-direction:row;justify-content:center;gap:16px;z-index:2}
-.screen-nav a{font-size:12px;line-height:1;text-decoration:none;color:var(--ink);padding:4px 8px}
-.screen-nav a.on span{font-weight:700}
-.screen-nav a.on{cursor:default}
-.screen-nav label{font-size:12px;line-height:1;color:var(--ink);padding:4px 8px;border-radius:8px}
-.screen-nav label.on span{font-weight:700}
-.screen-nav label.on{cursor:default}
-.screen-nav label:not(.on){cursor:pointer}
-.contact{position:absolute;bottom:24px;left:0;right:0;display:flex;flex-direction:row;justify-content:center;gap:24px;font-size:12px;z-index:2}
-.contact a,.contact span{font-size:12px;line-height:1;text-decoration:none;color:var(--ink);padding:4px 8px}
-.content{min-height:100svh;display:flex;position:relative}
+.screen-nav{position:absolute;top:24px;left:0;right:0;display:flex;justify-content:center;gap:16px;z-index:2}
+.screen-nav a,.screen-nav label{font-size:12px;line-height:1;padding:4px 8px}
+.screen-nav .on{cursor:default}
+.screen-nav .on span{font-weight:700}
+.contact{position:absolute;bottom:24px;left:0;right:0;display:flex;justify-content:center;gap:24px;font-size:12px;z-index:2}
+.contact a,.contact span{line-height:1;padding:4px 8px}
+.content{min-height:100svh;display:flex}
 .content-panel{margin:auto;width:100%;max-width:var(--wrap);padding:clamp(48px,8vh,80px) clamp(24px,6vh,40px)}
-.content .lede{font-size:20px;line-height:1.6;margin:0 0 20px}
-.content .status{font-size:16px;color:rgba(10,10,10,.4);margin:0 0 20px}
 .content h2{font-size:20px;font-weight:700;line-height:1.6;margin:32px 0 16px}
 .content h2 span{font-weight:400}
-.content h2 a{color:inherit;text-decoration:none;padding:4px 8px;margin:-4px -8px}
+.content h2 a,.content h2 label{padding:4px 8px;margin:-4px -8px}
+.content h2 label{cursor:pointer}
 .content h2:first-child{margin-top:0}
 .content h2+h2{margin-top:16px}
-.content p,.content li{font-size:20px;line-height:1.6}
-.content p{margin:0 0 20px}
-.content ul,.content ol{margin:0 0 20px;padding-left:24px}
-.content li{margin-bottom:12px}
+.content p{font-size:20px;line-height:1.6;margin:0 0 20px}
+.content .status{font-size:16px;color:rgba(10,10,10,.4)}
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .gallery img{width:100%;height:auto;display:block;border-radius:8px}
 @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
-html:has(>body.pager:not(.nest)){scroll-snap-type:y mandatory}
-body.pager:not(.nest) main>section{scroll-snap-align:start}
-html:has(>body.nest){height:100%;overflow:hidden}
-body.nest{height:100%;overflow:hidden}
-body.nest main{height:100svh;overflow-y:auto;scroll-snap-type:y mandatory}
-body.nest main>section{position:relative;min-height:100svh;scroll-snap-align:start;display:flex;flex-direction:column}
-main>.bend{height:100svh;margin-top:-100svh;scroll-snap-align:end;scroll-snap-stop:always;pointer-events:none}
-main>#eds:has(#eds-show-main:checked)+.bend{scroll-snap-align:none}
-body.nest .screen-nav,body.nest .section-content,body.nest .contact{flex-shrink:0}
-body.nest .screen-nav{position:static;padding-top:24px}
-body.nest .section-content{margin-block:auto}
-body.nest .contact{position:static;padding-bottom:24px}
-body.nest .content-panel{margin-block:0;margin-inline:auto}
+html:has(>.pager){scroll-snap-type:y mandatory}
+.pager main>section{scroll-snap-align:start}
+.tall main>section{min-height:100svh;display:flex;flex-direction:column}
+/* A section taller than the window also snaps at its end. */
+main>section::after{content:"";position:absolute;bottom:0;left:0;right:0;height:100svh;scroll-snap-align:end;scroll-snap-stop:always;pointer-events:none}
+main>#eds:has(#eds-show-main:checked)::after{scroll-snap-align:none}
+.tall .screen-nav,.tall .section-content,.tall .contact{flex-shrink:0}
+.tall .screen-nav{position:static;padding-top:24px}
+.tall .section-content{margin-block:auto}
+.tall .contact{position:static;padding-bottom:24px}
+.tall .content-panel{margin-block:0;margin-inline:auto}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 main>section:target .content-panel{animation:fadein .6s ease}
-.content .flat{list-style:none;padding-left:0;-webkit-user-select:text;user-select:text}
+.content .flat{list-style:none;margin:0 0 20px;padding:0;-webkit-user-select:text;user-select:text}
 .content .flat li{font-size:16px;line-height:1.6;margin-bottom:4px}
-.content h2 label{font:inherit;color:inherit;padding:4px 8px;margin:-4px -8px;cursor:pointer}
 .eds-radio{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 #eds .section-content{display:grid;margin-block:0 auto}
-#eds .swap-main,#eds .swap-list,#eds .swap-decks{grid-area:1/1;align-self:start}
-.content .swap-main,.content .swap-list,.content .swap-decks{display:none;opacity:0;transition:opacity .2s ease,transform .2s ease,display .2s allow-discrete}
-.content .swap-main{transform:translateX(-24px)}
-.content .swap-list,.content .swap-decks{transform:translateX(24px)}
+#eds .content-panel{grid-area:1/1;align-self:start;display:none;opacity:0;transform:translateX(24px);transition:opacity .2s ease,transform .2s ease,display .2s allow-discrete}
+#eds .swap-main{transform:translateX(-24px)}
 #eds-show-main:checked ~ .section-content .swap-main,#eds-show-list:checked ~ .section-content .swap-list,#eds-show-decks:checked ~ .section-content .swap-decks{display:block;opacity:1;transform:none;transition-delay:.2s}
 @starting-style{#eds-show-main:checked ~ .section-content .swap-main{opacity:0;transform:translateX(-24px)}#eds-show-list:checked ~ .section-content .swap-list,#eds-show-decks:checked ~ .section-content .swap-decks{opacity:0;transform:translateX(24px)}}
 #eds-show-main:focus-visible ~ .section-content label[for="eds-show-main"],#eds-show-list:focus-visible ~ .section-content label[for="eds-show-list"],#eds-show-decks:focus-visible ~ .section-content label[for="eds-show-decks"]{outline:2px solid var(--ink);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){main>section:target .content-panel{animation:none}.content .swap-main,.content .swap-list,.content .swap-decks{transition:none}}
+@media (prefers-reduced-motion:reduce){main>section:target .content-panel{animation:none}#eds .content-panel{transition:none}}
 .pedal-map{display:block;touch-action:none;width:100%;max-width:250px;flex:0 1 250px;overflow:visible}
 .pedal-map .body{fill:none;stroke:var(--ink);stroke-width:.4;stroke-dasharray:.6 1.2}
 .pedal-map .part{cursor:pointer;outline:none}
@@ -78,9 +67,11 @@ main>section:target .content-panel{animation:fadein .6s ease}
 .pedal-map .pointer,.pedal-map .lever{stroke:var(--ink);stroke-width:.8;stroke-linecap:round}
 .pedal-map text{font:3px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--ink);text-anchor:middle;stroke:none}
 .pedal-map .part:hover circle,.pedal-map .part:hover rect,.pedal-map .part:focus-visible circle,.pedal-map .part:focus-visible rect{fill:rgba(10,10,10,.2)}
-.pedal-map .part>:not(text){transform-box:fill-box;transform-origin:center;transition:fill .2s,transform .1s}
-.pedal-map .part:active>:not(text){transform:scale(.94)}
+.pedal-map .part>:not(text,path){transform-box:fill-box;transform-origin:center;transition:fill .2s,transform .1s}
+.pedal-map .part:active>:not(text,path){transform:scale(.94)}
 .pedal-map .part:active circle,.pedal-map .part:active rect{fill:rgba(10,10,10,.4)}
+/* Keyboard focus: a heavier stroke, since Safari paints no outline on SVG groups. */
+.pedal-map .part:focus-visible circle,.pedal-map .part:focus-visible rect{stroke-width:1.2}
 .pedal-map .part circle.dot{fill:var(--ink);stroke:none}
 .pedal-map .led.lit{fill:var(--ink)}
 .pedal-map .led.blink{animation:blink .5s steps(1) infinite}
@@ -89,7 +80,7 @@ main>section:target .content-panel{animation:fadein .6s ease}
 .pedal-map .knob{cursor:ns-resize}
 .flow{position:relative;width:160px;margin:0 26px}
 .content .chain{display:flex;flex-direction:column;gap:12px;list-style:none;padding:0;margin:0}
-.content .chain li{position:relative;box-sizing:border-box;margin:0;width:160px;height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--ink);border-radius:8px;font-size:12px;line-height:1.3;text-align:center;transition:opacity .2s}
+.content .chain li{position:relative;width:160px;height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--ink);border-radius:8px;font-size:12px;line-height:1.3;text-align:center}
 .content .chain li+li::before{content:"";position:absolute;top:-13px;left:79px;height:7px;border-left:1px solid var(--ink)}
 .content .chain li+li::after{content:"";position:absolute;top:-7px;left:76.5px;border:3.5px solid transparent;border-top:5px solid var(--ink);border-bottom:0}
 .content .chain li.off{opacity:.4;border-style:dashed}
@@ -105,14 +96,10 @@ main>section:target .content-panel{animation:fadein .6s ease}
 .group.off,.loop.off{opacity:.4;border-style:dashed}
 .rig+.status{text-align:center;min-height:1.6em}
 /* Hub: centred frosted buttons over the sphere. */
-html.stark-page,body.stark{height:100%}
-html.stark-page{scrollbar-width:none}
-html.stark-page::-webkit-scrollbar{display:none}
-body.stark{overflow:hidden;height:100dvh}
-.bg-canvas{position:fixed;inset:0;width:100%;height:100%;background:#fff;z-index:0}
-.view{position:fixed;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;padding:24px;flex-direction:column}
-.stark-stack{display:flex;flex-direction:column;align-items:stretch;gap:8px}
-.stark-btn{display:flex;align-items:center;justify-content:center;width:min(320px,80vw);padding:16px 24px;font-size:16px;font-weight:700;letter-spacing:.16em;-webkit-touch-callout:none;-webkit-user-drag:none}
+.stark{overflow:hidden}
+.view{position:fixed;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;padding:24px}
+.stark-stack{display:flex;flex-direction:column;gap:8px;width:min(320px,80vw)}
+.stark-btn{display:flex;align-items:center;justify-content:center;padding:16px 24px;font-size:16px;font-weight:700;letter-spacing:.16em;-webkit-touch-callout:none;-webkit-user-drag:none}
 .stark-btn::after{background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
-.stark-row{display:flex;gap:8px;width:min(320px,80vw)}
-.stark-row .stark-btn{width:auto;flex:1;padding:8px 4px;font-size:12px}
+.stark-row{display:flex;gap:8px}
+.stark-row .stark-btn{flex:1;padding:8px 4px;font-size:12px}

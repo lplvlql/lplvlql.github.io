@@ -5,16 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>mister tidy — lplvlql</title>
 <meta name="description" content="console launchers in the MiSTer boot menu">
-<link rel="stylesheet" href="../page.css?v=60">
+<link rel="stylesheet" href="../page.css?v=61">
 </head>
 <body class="pager">
-<canvas id="bg-sdcards" aria-hidden="true"></canvas>
-<div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero" id="top" data-label="mister tidy">
     <h1 class="hero-title">mister<br>tidy</h1>
   </section>
-  <div class="bend" aria-hidden="true"></div>
 
   <section class="content" id="content" data-label="main menu">
     <div class="content-panel">
@@ -47,7 +44,6 @@
       </ul>
     </div>
   </section>
-  <div class="bend" aria-hidden="true"></div>
 
   <section class="content" id="scripts" data-label="scripts">
     <div class="content-panel">
@@ -61,18 +57,17 @@
       <p class="status">delete.sh</p>
     </div>
   </section>
-  <div class="bend" aria-hidden="true"></div>
 </main>
-<script src="../engine.js?v=12"></script>
+<script src="../page.js?v=16"></script>
+<script src="../engine.js?v=13"></script>
 <script>
-// Background: dotted SD cards — geometry only, the engine is shared.
-startBackground("bg-sdcards", function (pts, rng, W, H) {
-
+// Background: dotted SD cards
+startBackground(scatterHomes(256), function (pts, rng) {
   // One SD card as a thin 3D solid: dotted faces, the chamfered
   // corner every SD card has, and nine contact pins along its top
   // edge drawn as small dotted rectangles on the top face.
   var CW = 84, CH = 110, CD = 6, i, j, k;
-  function inside(x, y) { return !(x + (-y) > 78); } // the chamfer cut
+  function inside(x, y) { return x - y <= 78; } // the chamfer cut
   function face(nx, ny, z) {
     for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) {
       var x = -CW / 2 + (i + 0.5) * CW / nx + (rng() - 0.5) * 4;
@@ -102,11 +97,8 @@ startBackground("bg-sdcards", function (pts, rng, W, H) {
     pts.push([cxp - 2.5, cyp, CD / 2 + 1]);
     pts.push([cxp + 2.5, cyp, CD / 2 + 1]);
   }
-}
-, function () { return scatterHomes(256, 33); }
-, Math.sqrt(84 * 84 / 4 + 110 * 110 / 4 + 6 * 6 / 4));
+  return Math.sqrt(84 * 84 / 4 + 110 * 110 / 4 + 6 * 6 / 4);
+});
 </script>
-
-<script src="../page.js?v=15"></script>
 </body>
 </html>

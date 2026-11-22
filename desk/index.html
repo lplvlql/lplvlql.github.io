@@ -5,16 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ledger desk — lplvlql</title>
 <meta name="description" content="ledger desk">
-<link rel="stylesheet" href="../page.css?v=60">
+<link rel="stylesheet" href="../page.css?v=61">
 </head>
 <body class="pager">
-<canvas id="bg-cubes" aria-hidden="true"></canvas>
-<div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero" id="top" data-label="ledger desk">
     <h1 class="hero-title">ledger<br>desk</h1>
   </section>
-<div class="bend" aria-hidden="true"></div>
 
   <section class="content" id="roadmap" data-label="roadmap">
   <div class="content-panel">
@@ -26,19 +23,14 @@
     <p class="status">planned</p>
   </div>
   </section>
-<div class="bend" aria-hidden="true"></div>
 </main>
-<script src="../engine.js?v=12"></script>
+<script src="../page.js?v=16"></script>
+<script src="../engine.js?v=13"></script>
 <script>
-// Background: one cube — geometry only, the engine is shared.
-startBackground("bg-cubes", function (pts, rng, W, H) {
-  // One cube: the full-size block of the ledger family.
-  dotCube(pts, rng, 0, 0, 0, 32, 7);
-}
-, function () { return scatterHomes(336, 44); }
-, Math.sqrt(3) * 32);
+// Background: one cube
+startBackground(scatterHomes(336), function (pts, rng) {
+  return dotCube(pts, rng, 32, 7);
+});
 </script>
-
-<script src="../page.js?v=15"></script>
 </body>
 </html>

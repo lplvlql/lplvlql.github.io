@@ -5,16 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ledger poker — lplvlql</title>
 <meta name="description" content="ledger poker">
-<link rel="stylesheet" href="../page.css?v=60">
+<link rel="stylesheet" href="../page.css?v=61">
 </head>
 <body class="pager">
-<canvas id="bg-chips" aria-hidden="true"></canvas>
-<div class="page-column" aria-hidden="true"></div>
 <main>
   <section class="hero" id="top" data-label="ledger poker">
     <h1 class="hero-title">ledger<br>poker</h1>
   </section>
-<div class="bend" aria-hidden="true"></div>
 
   <section class="content" id="roadmap" data-label="roadmap">
   <div class="content-panel">
@@ -28,14 +25,13 @@
     <p class="status">planned</p>
   </div>
   </section>
-<div class="bend" aria-hidden="true"></div>
 </main>
-<script src="../engine.js?v=12"></script>
+<script src="../page.js?v=16"></script>
+<script src="../engine.js?v=13"></script>
 <script>
-// Background: a chip in a cube — geometry only, the engine is shared.
-startBackground("bg-chips", function (pts, rng, W, H) {
-  // A chip in a cube: dotted rings inside a ledger block.
-  dotCube(pts, rng, 0, 0, 0, 40, 5);
+// Background: a chip in a cube
+startBackground(scatterHomes(320), function (pts, rng) {
+  var radius = dotCube(pts, rng, 40, 5);
   for (var ring = 0; ring <= 5; ring++) {
     var rr = 30 * ring / 5, nn = ring === 0 ? 1 : ring * 8;
     for (var k = 0; k < nn; k++) {
@@ -43,12 +39,8 @@ startBackground("bg-chips", function (pts, rng, W, H) {
       pts.push([Math.cos(a) * rr + (rng() - 0.5) * 3, Math.sin(a) * rr + (rng() - 0.5) * 3, (rng() - 0.5) * 3]);
     }
   }
-}
-, function () { return scatterHomes(320, 22); }
-, Math.sqrt(3) * 40);
+  return radius;
+});
 </script>
-
-
-<script src="../page.js?v=15"></script>
 </body>
 </html>
