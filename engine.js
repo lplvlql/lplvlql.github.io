@@ -1,6 +1,6 @@
 // Shared background engine: one cloud of permanent dot homes, dynamic
 // proximity lines recomputed every frame, and a shifting viewpoint:
-// touch, scroll, keys or the cursor move the camera, so every shape is seen
+// pointers, touch, the wheel and keys move the camera, so every shape is seen
 // from a new angle and nearer homes drift further than distant ones;
 // while it moves, dots shimmer between nearby positions.
 // Pages supply homes and a build function that fills pts and returns the
@@ -188,12 +188,15 @@ function startBackground(homes, build, link) {
   resize();
   if (reduceMotion) return;
 
-  // Every interaction moves the viewpoint: pointers aim it, scrolling
-  // rocks it, and each key press turns it somewhere new.
-  function aim(e) { viewTX = e.clientX / W * 2 - 1; viewTY = e.clientY / H * 2 - 1; }
-  addEventListener("pointermove", aim);
-  addEventListener("pointerdown", aim);
-  addEventListener("scroll", function () { viewTY = Math.sin(scrollY / H * 2); });
+  // Only user input moves the viewpoint, never the page moving: pointers and
+  // touches aim it, the wheel pushes it, and each key press turns it somewhere new.
+  function clamp(v) { return Math.max(-1, Math.min(1, v)); }
+  function aim(x, y) { viewTX = x / W * 2 - 1; viewTY = y / H * 2 - 1; }
+  ["pointerdown", "pointermove", "pointerup"].forEach(function (type) {
+    addEventListener(type, function (e) { aim(e.clientX, e.clientY); });
+  });
+  addEventListener("touchmove", function (e) { aim(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+  addEventListener("wheel", function (e) { viewTX = clamp(viewTX + e.deltaX / 500); viewTY = clamp(viewTY + e.deltaY / 500); }, { passive: true });
   addEventListener("keydown", function () { viewTX = Math.random() * 2 - 1; viewTY = Math.random() * 2 - 1; });
 
   function frame(now) {
