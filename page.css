@@ -13,10 +13,8 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100lvh;pointer-events:none}
 /* The frosted column behind the text: part of the page, since iOS draws nothing fixed under its address bar. */
 .pager main::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(var(--wrap),100%);background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);pointer-events:none}
 main{position:relative;z-index:1}
-/* The gap keeps the next section out of sight under a see-through address bar. */
-.pager main{display:flex;flex-direction:column;gap:120px}
 /* Each section fills the window; its content is centred, or starts at the top when longer. */
-main>section{position:relative;min-height:100dvh;display:flex;flex-direction:column}
+main>section{position:relative;min-height:100svh;display:flex;flex-direction:column}
 .hero-title{font-weight:700;font-size:clamp(32px,8vw,80px);line-height:1;letter-spacing:.06em;text-align:center;margin:auto}
 /* One row of numbers and one of links, frosted so the page can scroll behind them. */
 .screen-nav,.contact{position:fixed;left:0;right:0;z-index:2;width:fit-content;margin:0 auto;display:flex;gap:4px;font-size:12px;line-height:1}
@@ -37,10 +35,6 @@ main>section{position:relative;min-height:100dvh;display:flex;flex-direction:col
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .gallery img{width:100%;height:auto;display:block;border-radius:8px}
 @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
-html:has(>.pager){scroll-snap-type:y mandatory}
-.pager main>section,.pager main>section::after{scroll-snap-align:start;scroll-snap-stop:always}
-/* The last screenful of a section: a second stop for long ones, the same stop for the rest. */
-.pager main>section::after{content:"";position:absolute;bottom:0;width:100%;height:100dvh;pointer-events:none}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 main>section:target .content-panel{animation:fadein .6s ease}
 .content .flat{list-style:none;margin:0 0 20px;padding:0;-webkit-user-select:text;user-select:text}
@@ -54,7 +48,7 @@ main>section:target .content-panel{animation:fadein .6s ease}
 #eds-show-main:focus-visible ~ .section-content label[for="eds-show-main"],#eds-show-list:focus-visible ~ .section-content label[for="eds-show-list"],#eds-show-decks:focus-visible ~ .section-content label[for="eds-show-decks"]{outline:2px solid var(--ink);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){main>section:target .content-panel{animation:none}#eds .content-panel{transition:none}}
 /* The pedal sits above its chain and takes the height the rest of the screen leaves it. */
-.pedal-map{display:block;touch-action:none;height:clamp(240px,calc(100dvh - 466px),456px);overflow:visible}
+.pedal-map{display:block;touch-action:none;height:clamp(240px,calc(100svh - 466px),456px);overflow:visible}
 .pedal-map .body{fill:none;stroke:var(--ink);stroke-width:.4;stroke-dasharray:.6 1.2}
 .pedal-map .part{cursor:pointer;outline:none}
 .pedal-map circle,.pedal-map rect{fill:#fff;stroke:var(--ink);stroke-width:.5;transition:fill .2s}
