@@ -87,8 +87,8 @@ function startBackground(homes, build, link) {
     centres = [];
     for (var ci = 0; ci < homes.length; ci++) {
       var c = homes[ci], hz = c.z || 0;
-      // Parallax about the middle depth: the nearest homes move with the input,
-      // the furthest against it, and the field wraps so it never runs out.
+      // Parallax about the middle depth, like looking through a window: the nearest
+      // homes move against the input, the furthest with it, and the field wraps.
       var hs = FIELD / (FIELD + hz);
       var cxp = W / 2 + wrap((c.x - 0.5) * WORLD_W + camX * hz / DEPTH, WORLD_W) * hs;
       var cyp = H / 2 + wrap((c.y - 0.5) * WORLD_H + camY * hz / DEPTH, WORLD_H) * hs;
@@ -196,7 +196,7 @@ function startBackground(homes, build, link) {
     if (e.type === "wheel") { dx = -e.deltaX; dy = -e.deltaY; }
     else if (/move$/.test(e.type) && last && p.clientX !== undefined) { dx = p.clientX - last[0]; dy = p.clientY - last[1]; }
     if (/move$|wheel/.test(e.type)) strength = Math.min(1, (Math.abs(dx) + Math.abs(dy)) / 40);
-    velX += dx * 2.5; velY += dy * 2.5; // once coasted, the nearest layer has moved as far as the input
+    velX -= dx * 2.5; velY -= dy * 2.5; // once coasted, the nearest layer has moved as far as the input, the other way
     jolt = Math.max(jolt, strength); roll += 1;
     last = p.clientX !== undefined ? [p.clientX, p.clientY] : null;
   }
