@@ -71,8 +71,8 @@ function startBackground(homes, build, link) {
     draw();
   }
 
-  // Viewpoint: target in [-1, 1], eased without overshoot.
-  var viewX = 0, viewY = 0, viewTX = 0, viewTY = 0;
+  // Viewpoint and its velocity: input pushes it, then it coasts back to centre.
+  var viewX = 0, viewY = 0, velX = 0, velY = 0;
   var VIEW = 0.5, PARALLAX = 48; // max view turn (radians) and drift (px)
   var SHIMMER = 6; // px a dot may hop while the view is moving
 
@@ -84,7 +84,7 @@ function startBackground(homes, build, link) {
     centres = [];
     // Shimmer: while the view glides, dots hop between nearby positions;
     // it fades to nothing as the view settles.
-    var jump = SHIMMER * Math.min(1, (Math.abs(viewTX - viewX) + Math.abs(viewTY - viewY)) * 2);
+    var jump = SHIMMER * Math.min(1, (Math.abs(velX) + Math.abs(velY)) / 2);
     var step = Math.floor(t / 60);
     var ox = (WORLD_W - W) / 2, oy = (WORLD_H - H) / 2; // centre the field
     for (var ci = 0; ci < homes.length; ci++) {
@@ -188,12 +188,17 @@ function startBackground(homes, build, link) {
   resize();
   if (reduceMotion) return;
 
-  // Only user input moves the viewpoint, never the page moving. Every input
-  // event jolts it a little, and one with a position also aims it there.
+  // Only user input moves the viewpoint, never the page moving. Moves push it
+  // along with the pointer or finger, the wheel pushes it its way, and every
+  // other event kicks it in a random direction.
+  var last = null;
+  function push(x, y) { velX += x; velY += y; }
   function react(e) {
     var p = e.touches && e.touches[0] || e;
-    if (p.clientX !== undefined) { viewTX = p.clientX / W * 2 - 1; viewTY = p.clientY / H * 2 - 1; }
-    viewX += (Math.random() - 0.5) * 0.4; viewY += (Math.random() - 0.5) * 0.4;
+    if (e.type === "wheel") push(e.deltaX / W * 4, e.deltaY / H * 4);
+    else if (/move$/.test(e.type) && last && p.clientX !== undefined) push((p.clientX - last[0]) / W * 8, (p.clientY - last[1]) / H * 8);
+    else if (!/move$/.test(e.type)) push((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6);
+    last = p.clientX !== undefined ? [p.clientX, p.clientY] : null;
   }
   ["pointerdown", "pointermove", "pointerup", "touchstart", "touchmove", "touchend", "wheel", "keydown", "keyup"].forEach(function (type) {
     addEventListener(type, react, { passive: true });
@@ -203,8 +208,9 @@ function startBackground(homes, build, link) {
     var dt = lastFrame === null ? 16 : Math.min(50, now - lastFrame);
     lastFrame = now;
     animNow += dt;
-    var ease = 1 - Math.exp(-dt / 300);
-    viewX += (viewTX - viewX) * ease; viewY += (viewTY - viewY) * ease;
+    var t = dt / 1000, drag = Math.exp(-dt / 400);
+    velX = (velX - viewX * 20 * t) * drag; velY = (velY - viewY * 20 * t) * drag;
+    viewX = Math.max(-1.5, Math.min(1.5, viewX + velX * t)); viewY = Math.max(-1.5, Math.min(1.5, viewY + velY * t));
     project();
     draw();
     requestAnimationFrame(frame);
