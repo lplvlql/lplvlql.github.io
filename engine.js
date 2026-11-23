@@ -1,8 +1,7 @@
 // Shared background engine: one cloud of permanent dot homes, dynamic
-// proximity lines recomputed every frame, and a shifting viewpoint:
-// every input event moves the camera, so every shape is seen
-// from a new angle and nearer homes drift further than distant ones;
-// while it moves, dots shimmer between nearby positions.
+// proximity lines recomputed every frame, and one shared spin: input turns
+// every shape around its own centre, and while it turns, dots shimmer
+// between nearby positions.
 // Pages supply homes and a build function that fills pts and returns the
 // shape's radius; an optional link distance joins nearby homes with dotted lines.
 // Fixed world: homes are scattered once per load over a 2560x1440 field
@@ -71,9 +70,9 @@ function startBackground(homes, build, link) {
     draw();
   }
 
-  // Viewpoint and its velocity: input pushes it, then it coasts back to centre.
-  var viewX = 0, viewY = 0, velX = 0, velY = 0;
-  var VIEW = 0.5, PARALLAX = 48; // max view turn (radians) and drift (px)
+  // One spin shared by every shape, around each shape's own centre (radians),
+  // and its speed (radians per second): input pushes it, friction stops it.
+  var spinX = 0, spinY = 0, velX = 0, velY = 0;
   var SHIMMER = 6; // px a dot may hop while the view is moving
 
   var centres = []; // visible homes on screen, for optional links
@@ -84,24 +83,23 @@ function startBackground(homes, build, link) {
     centres = [];
     // Shimmer: while the view glides, dots hop between nearby positions;
     // it fades to nothing as the view settles.
-    var jump = SHIMMER * Math.min(1, (Math.abs(velX) + Math.abs(velY)) / 2);
+    var jump = SHIMMER * Math.min(1, Math.abs(velX) + Math.abs(velY));
     var step = Math.floor(t / 60);
     var ox = (WORLD_W - W) / 2, oy = (WORLD_H - H) / 2; // centre the field
     for (var ci = 0; ci < homes.length; ci++) {
       var c = homes[ci];
-      var depth = (ci * 0.6180339887) % 1 * 2 - 1; // stable per home, -1 far to 1 near
-      var cxp = c.x * WORLD_W - ox + viewX * depth * PARALLAX, cyp = c.y * WORLD_H - oy + viewY * depth * PARALLAX;
+      var cxp = c.x * WORLD_W - ox, cyp = c.y * WORLD_H - oy;
       if (cxp < -256 || cxp > W + 256 || cyp < -256 || cyp > H + 256) continue; // offscreen: cropped, not generated
       centres.push(cxp, cyp);
       var ax = c.rx + t / 1000 * c.sx, ay = c.ry + t / 1000 * c.sy, az = c.rz + t / 1000 * c.sz;
       var cax = Math.cos(ax), sax = Math.sin(ax), cay = Math.cos(ay), say = Math.sin(ay), caz = Math.cos(az), saz = Math.sin(az);
-      var cvy = Math.cos(viewX * VIEW), svy = Math.sin(viewX * VIEW), cvx = Math.cos(viewY * VIEW), svx = Math.sin(viewY * VIEW);
+      var cvy = Math.cos(spinX), svy = Math.sin(spinX), cvx = Math.cos(spinY), svx = Math.sin(spinY);
       for (var i = 0; i < pts.length; i++, n++) {
         var lx = pts[i][0], ly = pts[i][1], lz = pts[i][2];
         var y1 = ly * cax - lz * sax, z1 = ly * sax + lz * cax;
         var x2 = lx * cay + z1 * say, z2 = z1 * cay - lx * say;
         var x3 = x2 * caz - y1 * saz, y3 = x2 * saz + y1 * caz;
-        var x4 = x3 * cvy + z2 * svy, z4 = z2 * cvy - x3 * svy; // the viewpoint turns
+        var x4 = x3 * cvy + z2 * svy, z4 = z2 * cvy - x3 * svy; // the shared spin
         var y5 = y3 * cvx - z4 * svx, z5 = y3 * svx + z4 * cvx;
         var s = 1 / (1 + z5 / CAM);
         bx[n] = cxp + x4 * s; by[n] = cyp + y5 * s;
@@ -188,16 +186,16 @@ function startBackground(homes, build, link) {
   resize();
   if (reduceMotion) return;
 
-  // Only user input moves the viewpoint, never the page moving. Moves push it
-  // along with the pointer or finger, the wheel pushes it its way, and every
-  // other event kicks it in a random direction.
+  // Only user input spins the shapes, never the page moving. Moving a pointer
+  // or finger, or the wheel, turns them the way it goes (a full-screen swipe is
+  // about half a turn); every other event flicks them in a random direction.
   var last = null;
-  function push(x, y) { velX += x; velY += y; }
+  function push(x, y) { velX -= x / W * 8; velY += y / H * 8; }
   function react(e) {
     var p = e.touches && e.touches[0] || e;
-    if (e.type === "wheel") push(e.deltaX / W * 4, e.deltaY / H * 4);
-    else if (/move$/.test(e.type) && last && p.clientX !== undefined) push((p.clientX - last[0]) / W * 8, (p.clientY - last[1]) / H * 8);
-    else if (!/move$/.test(e.type)) push((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6);
+    if (e.type === "wheel") push(e.deltaX, e.deltaY);
+    else if (/move$/.test(e.type) && last && p.clientX !== undefined) push(p.clientX - last[0], p.clientY - last[1]);
+    else if (!/move$/.test(e.type)) { velX += Math.random() * 2 - 1; velY += Math.random() * 2 - 1; }
     last = p.clientX !== undefined ? [p.clientX, p.clientY] : null;
   }
   ["pointerdown", "pointermove", "pointerup", "touchstart", "touchmove", "touchend", "wheel", "keydown", "keyup"].forEach(function (type) {
@@ -209,8 +207,8 @@ function startBackground(homes, build, link) {
     lastFrame = now;
     animNow += dt;
     var t = dt / 1000, drag = Math.exp(-dt / 400);
-    velX = (velX - viewX * 20 * t) * drag; velY = (velY - viewY * 20 * t) * drag;
-    viewX = Math.max(-1.5, Math.min(1.5, viewX + velX * t)); viewY = Math.max(-1.5, Math.min(1.5, viewY + velY * t));
+    velX *= drag; velY *= drag;
+    spinX += velX * t; spinY += velY * t;
     project();
     draw();
     requestAnimationFrame(frame);
