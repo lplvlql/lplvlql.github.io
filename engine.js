@@ -7,7 +7,7 @@
 // shape's radius; an optional link distance joins nearby homes with dotted lines.
 // Fixed world: homes are scattered once per load over a 2560x1440 field
 // that viewports crop.
-var WORLD_W = 2560, WORLD_H = 1440;
+var WORLD_W = 2560, WORLD_H = 1440, DEPTH = 600; // field size and depth either side of its middle (px)
 // Homes at least minDist apart, each with a random starting angle and slow spin.
 function scatterHomes(minDist) {
   var homes = [], count = Math.min(64, Math.round(WORLD_W * WORLD_H / (minDist * minDist)));
@@ -15,7 +15,7 @@ function scatterHomes(minDist) {
     var x = Math.random(), y = Math.random();
     if (homes.some(function (h) { return Math.hypot(x - h.x, y - h.y) < minDist / WORLD_W; })) continue;
     homes.push({
-      x: x, y: y, z: (Math.random() - 0.5) * 1200, // depth in px: the field is a 3D cloud
+      x: x, y: y, z: (Math.random() * 2 - 1) * DEPTH, // the field is a 3D cloud
       rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2,
       sx: (Math.random() - 0.5) * 0.25, sy: (Math.random() - 0.5) * 0.2, sz: (Math.random() - 0.5) * 0.15
     });
@@ -76,7 +76,7 @@ function startBackground(homes, build, link) {
   var FIELD = 1500; // camera distance from the focal plane (px)
   // Jolt: how far dots sit from home (0 to 1); each event draws new spots.
   var jolt = 0, roll = 0;
-  var JUMP = 10; // px a dot may sit from home at full jolt
+  var JUMP = 6; // px a dot may sit from home at full jolt
 
   var centres = []; // visible homes on screen, for optional links
   function hop(n, k) { var h = Math.sin(n * 12.9898 + k * 78.233) * 43758.5453; return h - Math.floor(h) - 0.5; }
@@ -85,14 +85,13 @@ function startBackground(homes, build, link) {
   function project() {
     var n = 0, t = animNow;
     centres = [];
-    var away = JUMP * jolt;
     for (var ci = 0; ci < homes.length; ci++) {
       var c = homes[ci], hz = c.z || 0;
-      // Parallax about the focal plane: nearer homes shift with the camera,
-      // further ones against it, and the field wraps so it never runs out.
+      // Parallax about the middle depth: the nearest homes move with the input,
+      // the furthest against it, and the field wraps so it never runs out.
       var hs = FIELD / (FIELD + hz);
-      var cxp = W / 2 + wrap((c.x - 0.5) * WORLD_W + camX * hz / FIELD, WORLD_W) * hs;
-      var cyp = H / 2 + wrap((c.y - 0.5) * WORLD_H + camY * hz / FIELD, WORLD_H) * hs;
+      var cxp = W / 2 + wrap((c.x - 0.5) * WORLD_W + camX * hz / DEPTH, WORLD_W) * hs;
+      var cyp = H / 2 + wrap((c.y - 0.5) * WORLD_H + camY * hz / DEPTH, WORLD_H) * hs;
       if (cxp < -256 || cxp > W + 256 || cyp < -256 || cyp > H + 256) continue; // offscreen: cropped, not generated
       centres.push(cxp, cyp);
       var ax = c.rx + t / 1000 * c.sx, ay = c.ry + t / 1000 * c.sy, az = c.rz + t / 1000 * c.sz;
@@ -104,7 +103,6 @@ function startBackground(homes, build, link) {
         var x3 = x2 * caz - y1 * saz, y3 = x2 * saz + y1 * caz;
         var s = hs / (1 + z2 / CAM);
         bx[n] = cxp + x3 * s; by[n] = cyp + y3 * s;
-        if (away > 0.05) { bx[n] += hop(n, roll) * 2 * away; by[n] += hop(n, roll + 0.5) * 2 * away; }
         var f = Math.max(0, Math.min(1, (MAXZ - z2) / (2 * MAXZ)));
         sf[n] = f + (1 - f) / 8; // front solid, back diffused
       }
@@ -157,10 +155,12 @@ function startBackground(homes, build, link) {
       }
       ctx.stroke();
     }
+    var away = 2 * JUMP * jolt;
     for (var dj = 0; dj < activeN; dj++) {
       ctx.globalAlpha = sf[dj];
       ctx.beginPath();
-      ctx.arc(bx[dj], by[dj], 1.5, 0, Math.PI * 2); // every dot the same size
+      // Dots sit away from home by the jolt; lines stay on the homes.
+      ctx.arc(bx[dj] + hop(dj, roll) * away, by[dj] + hop(dj, roll + 0.5) * away, 1.5, 0, Math.PI * 2); // every dot the same size
       ctx.fill();
     }
     // Optional links: homes nearer than `link` px join with a dotted line
@@ -189,13 +189,14 @@ function startBackground(homes, build, link) {
 
   // Only user input moves the background, never the page moving. Every event
   // jolts the dots: fully for presses, releases and keys, by distance for moves.
+  // Moves and the wheel also shift the camera.
   var last = null;
   function react(e) {
     var p = e.touches && e.touches[0] || e, dx = 0, dy = 0, strength = 1;
     if (e.type === "wheel") { dx = -e.deltaX; dy = -e.deltaY; }
     else if (/move$/.test(e.type) && last && p.clientX !== undefined) { dx = p.clientX - last[0]; dy = p.clientY - last[1]; }
     if (/move$|wheel/.test(e.type)) strength = Math.min(1, (Math.abs(dx) + Math.abs(dy)) / 40);
-    velX += dx * 8; velY += dy * 8;
+    velX += dx * 2.5; velY += dy * 2.5; // once coasted, the nearest layer has moved as far as the input
     jolt = Math.max(jolt, strength); roll += 1;
     last = p.clientX !== undefined ? [p.clientX, p.clientY] : null;
   }
