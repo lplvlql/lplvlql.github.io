@@ -1,6 +1,6 @@
 // Shared background engine: one cloud of permanent dot homes, dynamic
 // proximity lines recomputed every frame, and a shifting viewpoint:
-// pointers, touch, the wheel and keys move the camera, so every shape is seen
+// every input event moves the camera, so every shape is seen
 // from a new angle and nearer homes drift further than distant ones;
 // while it moves, dots shimmer between nearby positions.
 // Pages supply homes and a build function that fills pts and returns the
@@ -188,16 +188,16 @@ function startBackground(homes, build, link) {
   resize();
   if (reduceMotion) return;
 
-  // Only user input moves the viewpoint, never the page moving: pointers and
-  // touches aim it, the wheel pushes it, and each key press turns it somewhere new.
-  function clamp(v) { return Math.max(-1, Math.min(1, v)); }
-  function aim(x, y) { viewTX = x / W * 2 - 1; viewTY = y / H * 2 - 1; }
-  ["pointerdown", "pointermove", "pointerup"].forEach(function (type) {
-    addEventListener(type, function (e) { aim(e.clientX, e.clientY); });
+  // Only user input moves the viewpoint, never the page moving. Every input
+  // event jolts it a little, and one with a position also aims it there.
+  function react(e) {
+    var p = e.touches && e.touches[0] || e;
+    if (p.clientX !== undefined) { viewTX = p.clientX / W * 2 - 1; viewTY = p.clientY / H * 2 - 1; }
+    viewX += (Math.random() - 0.5) * 0.4; viewY += (Math.random() - 0.5) * 0.4;
+  }
+  ["pointerdown", "pointermove", "pointerup", "touchstart", "touchmove", "touchend", "wheel", "keydown", "keyup"].forEach(function (type) {
+    addEventListener(type, react, { passive: true });
   });
-  addEventListener("touchmove", function (e) { aim(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
-  addEventListener("wheel", function (e) { viewTX = clamp(viewTX + e.deltaX / 500); viewTY = clamp(viewTY + e.deltaY / 500); }, { passive: true });
-  addEventListener("keydown", function () { viewTX = Math.random() * 2 - 1; viewTY = Math.random() * 2 - 1; });
 
   function frame(now) {
     var dt = lastFrame === null ? 16 : Math.min(50, now - lastFrame);

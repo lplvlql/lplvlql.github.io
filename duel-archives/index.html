@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>duel archives — lplvlql</title>
 <meta name="description" content="enhanced Yu-Gi-Oh! GBA games">
-<link rel="stylesheet" href="../page.css?v=71">
+<link rel="stylesheet" href="../page.css?v=73">
 </head>
 <body class="pager">
 <main>
@@ -35,11 +35,11 @@
 </section>
 
   <section class="content" id="eds" data-label="Eternal Duelist Soul">
-<input type="radio" name="eds-panel" id="eds-show-main" class="eds-radio" aria-label="roadmap" checked>
-<input type="radio" name="eds-panel" id="eds-show-list" class="eds-radio" aria-label="card pool">
-<input type="radio" name="eds-panel" id="eds-show-decks" class="eds-radio" aria-label="deck lists">
-  <div class="section-content">
-  <div class="content-panel swap-main">
+<input type="radio" name="eds-panel" id="eds-show-main" class="panel-switch" aria-label="roadmap" checked>
+<input type="radio" name="eds-panel" id="eds-show-list" class="panel-switch" aria-label="card pool">
+<input type="radio" name="eds-panel" id="eds-show-decks" class="panel-switch" aria-label="deck lists">
+  <div class="panels">
+  <div class="content-panel">
     <p>Eternal Duelist Soul → YGO02 Enhanced</p>
     <h2><label for="eds-show-list">card <span>pool</span></label></h2>
     <p class="status">complete</p>
@@ -54,7 +54,7 @@
     <h2>side <span>decking</span></h2>
     <p class="status">planned</p>
   </div>
-  <div class="content-panel swap-list">
+  <div class="content-panel">
     <h2><label for="eds-show-main">back</label></h2>
 
     <ul class="flat">
@@ -330,7 +330,7 @@
       <li>Insect Monster Token</li>
     </ul>
   </div>
-  <div class="content-panel swap-decks">
+  <div class="content-panel">
     <h2><label for="eds-show-main">back</label></h2>
 
     <h3>Yugi Muto (40)</h3>
@@ -1094,7 +1094,7 @@
 </section>
 </main>
 <script src="../page.js?v=17"></script>
-<script src="../engine.js?v=16"></script>
+<script src="../engine.js?v=17"></script>
 <script>
 // Background: simple point-down pyramids
 startBackground(scatterHomes(336), function (pts, rng) {

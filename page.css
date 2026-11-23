@@ -1,6 +1,6 @@
 :root{--ink:rgba(10,10,10,.8);--wrap:720px;--frost:rgba(255,255,255,.2);--blur:blur(6px)}
 *{box-sizing:border-box}
-body{margin:0;-webkit-user-select:none;user-select:none;background:#fff;color:var(--ink);font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;-webkit-font-smoothing:antialiased}
+body{margin:0;user-select:none;background:#fff;color:var(--ink);font-family:monospace}
 a{color:var(--ink);text-decoration:none}
 a::before,label::before{content:"";display:inline-block;width:4px;height:4px;margin-right:4px;border-radius:50%;background:currentColor;vertical-align:middle}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
@@ -10,8 +10,8 @@ a::before,label::before{content:"";display:inline-block;width:4px;height:4px;mar
 .screen-nav a:hover::after,.contact a:hover::after,.content h2 a:hover::after,.content h2 label:hover::after,.stark-btn:hover::after{background:rgba(10,10,10,.2)}
 .screen-nav a:active::after,.contact a:active::after,.content h2 a:active::after,.content h2 label:active::after,.stark-btn:active::after{background:rgba(10,10,10,.4);transform:scale(.94)}
 canvas{position:fixed;top:0;left:0;width:100%;height:100vh;pointer-events:none}
-/* The frosted column behind the text: part of the page, since iOS draws nothing fixed under its address bar. */
-.pager main::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(var(--wrap),100%);background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);pointer-events:none}
+/* The frosted column behind the text, as long as the page. */
+.pager main::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(var(--wrap),100%);background:var(--frost);backdrop-filter:var(--blur);pointer-events:none}
 main{position:relative;z-index:1}
 /* The gap keeps the next section out of sight under a see-through address bar. */
 .pager main{display:flex;flex-direction:column;gap:120px}
@@ -43,16 +43,17 @@ html:has(>.pager){scroll-snap-type:y mandatory}
 .pager main>section::after{content:"";position:absolute;bottom:0;width:100%;height:100vh;pointer-events:none}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 main>section:target .content-panel{animation:fadein .6s ease}
-.content .flat{list-style:none;margin:0 0 20px;padding:0;-webkit-user-select:text;user-select:text}
+.content .flat{list-style:none;margin:0 0 20px;padding:0;user-select:text}
 .content .flat li{font-size:16px;line-height:1.6;margin-bottom:4px}
-.eds-radio{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-#eds .section-content{display:grid;margin:auto 0}
-#eds .content-panel{grid-area:1/1;margin-block:0;display:none;opacity:0;transform:translateX(24px);transition:opacity .2s ease,transform .2s ease,display .2s allow-discrete}
-#eds .swap-main{transform:translateX(-24px)}
-#eds-show-main:checked ~ .section-content .swap-main,#eds-show-list:checked ~ .section-content .swap-list,#eds-show-decks:checked ~ .section-content .swap-decks{display:block;opacity:1;transform:none;transition-delay:.2s}
-@starting-style{#eds-show-main:checked ~ .section-content .swap-main{opacity:0;transform:translateX(-24px)}#eds-show-list:checked ~ .section-content .swap-list,#eds-show-decks:checked ~ .section-content .swap-decks{opacity:0;transform:translateX(24px)}}
-#eds-show-main:focus-visible ~ .section-content label[for="eds-show-main"],#eds-show-list:focus-visible ~ .section-content label[for="eds-show-list"],#eds-show-decks:focus-visible ~ .section-content label[for="eds-show-decks"]{outline:2px solid var(--ink);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){main>section:target .content-panel{animation:none}#eds .content-panel{transition:none}}
+/* Panel switches: the nth switch shows the nth panel; the first slides in from the left, the rest from the right. */
+.panel-switch{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.panels{display:grid;margin:auto 0}
+.panels>*{grid-area:1/1;margin-block:0;display:none;opacity:0;transform:translateX(24px);transition:opacity .2s ease,transform .2s ease,display .2s allow-discrete}
+.panels>:first-child{transform:translateX(-24px)}
+.panel-switch:nth-of-type(1):checked~.panels>:nth-child(1),.panel-switch:nth-of-type(2):checked~.panels>:nth-child(2),.panel-switch:nth-of-type(3):checked~.panels>:nth-child(3){display:block;opacity:1;transform:none;transition-delay:.2s}
+@starting-style{.panel-switch:nth-of-type(1):checked~.panels>:nth-child(1){opacity:0;transform:translateX(-24px)}.panel-switch:nth-of-type(2):checked~.panels>:nth-child(2),.panel-switch:nth-of-type(3):checked~.panels>:nth-child(3){opacity:0;transform:translateX(24px)}}
+.panel-switch:focus-visible~.panels{outline:2px solid var(--ink);outline-offset:8px}
+@media (prefers-reduced-motion:reduce){main>section:target .content-panel{animation:none}.panels>*{transition:none}}
 /* The pedal sits above its chain and takes the height the rest of the screen leaves it. */
 .pedal-map{display:block;touch-action:none;height:clamp(240px,calc(100vh - 466px),456px);overflow:visible}
 .pedal-map .body{fill:none;stroke:var(--ink);stroke-width:.4;stroke-dasharray:.6 1.2}
@@ -60,12 +61,12 @@ main>section:target .content-panel{animation:fadein .6s ease}
 .pedal-map circle,.pedal-map rect{fill:#fff;stroke:var(--ink);stroke-width:.5;transition:fill .2s}
 .pedal-map .cap{fill:none}
 .pedal-map .pointer,.pedal-map .lever{stroke:var(--ink);stroke-width:.8;stroke-linecap:round}
-.pedal-map text{font:3px ui-monospace,"SF Mono",Menlo,Consolas,monospace;fill:var(--ink);text-anchor:middle;stroke:none}
+.pedal-map text{font:3px monospace;fill:var(--ink);text-anchor:middle;stroke:none}
 .pedal-map .part:hover circle,.pedal-map .part:hover rect,.pedal-map .part:focus-visible circle,.pedal-map .part:focus-visible rect{fill:rgba(10,10,10,.2)}
 .pedal-map .part>:not(text,path){transform-box:fill-box;transform-origin:center;transition:fill .2s,transform .1s}
 .pedal-map .part:active>:not(text,path){transform:scale(.94)}
 .pedal-map .part:active circle,.pedal-map .part:active rect{fill:rgba(10,10,10,.4)}
-/* Keyboard focus: a heavier stroke, since Safari paints no outline on SVG groups. */
+/* Keyboard focus: a heavier stroke on the control. */
 .pedal-map .part:focus-visible circle,.pedal-map .part:focus-visible rect{stroke-width:1.2}
 .pedal-map .part circle.dot{fill:var(--ink);stroke:none}
 .pedal-map .led.lit{fill:var(--ink)}
@@ -94,7 +95,7 @@ main>section:target .content-panel{animation:fadein .6s ease}
 .stark{overflow:hidden}
 .view{position:fixed;top:0;left:0;right:0;height:100vh;z-index:1;display:flex;align-items:center;justify-content:center;padding:24px}
 .stark-stack{display:flex;flex-direction:column;gap:8px;width:min(320px,80vw)}
-.stark-btn{display:flex;align-items:center;justify-content:center;padding:16px 24px;font-size:16px;font-weight:700;letter-spacing:.16em;-webkit-touch-callout:none;-webkit-user-drag:none}
-.screen-nav a::after,.contact>*::after,.stark-btn::after{background:var(--frost);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+.stark-btn{display:flex;align-items:center;justify-content:center;padding:16px 24px;font-size:16px;font-weight:700;letter-spacing:.16em}
+.screen-nav a::after,.contact>*::after,.stark-btn::after{background:var(--frost);backdrop-filter:var(--blur)}
 .stark-row{display:flex;gap:8px}
 .stark-row .stark-btn{flex:1;padding:8px 4px;font-size:12px}
