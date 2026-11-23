@@ -5,30 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>lplvlql</title>
 <meta name="description" content="chronicle, duel archives, ledger, desk, pocket, poker, mister tidy, usual time">
-<link rel="stylesheet" href="page.css?v=73">
+<link rel="stylesheet" href="page.css?v=75">
 </head>
-<body class="stark">
+<body class="hub">
 
   <main class="view" aria-label="Projects">
-    <nav class="stark-stack">
-      <a class="stark-btn" href="chronicle/">chronicle</a>
-      <a class="stark-btn" href="duel-archives/">duel archives</a>
-      <a class="stark-btn" href="ledger/">ledger</a>
-      <div class="stark-row">
-        <a class="stark-btn" href="desk/">desk</a>
-        <a class="stark-btn" href="pocket/">pocket</a>
-        <a class="stark-btn" href="poker/">poker</a>
+    <nav class="hub-stack">
+      <a class="hub-btn" href="chronicle/">chronicle</a>
+      <a class="hub-btn" href="duel-archives/">duel archives</a>
+      <a class="hub-btn" href="ledger/">ledger</a>
+      <div class="hub-row">
+        <a class="hub-btn" href="desk/">desk</a>
+        <a class="hub-btn" href="pocket/">pocket</a>
+        <a class="hub-btn" href="poker/">poker</a>
       </div>
-      <a class="stark-btn" href="mister-tidy/">mister tidy</a>
-      <a class="stark-btn" href="usual-time/">usual time</a>
+      <a class="hub-btn" href="mister-tidy/">mister tidy</a>
+      <a class="hub-btn" href="usual-time/">usual time</a>
     </nav>
   </main>
 
-<script src="engine.js?v=26"></script>
+<script src="engine.js?v=31"></script>
 <script>
 // Background: one sphere of connected points
 // One home at the centre, tilted 15 degrees, a full turn every 150 s.
-startBackground([{ x: 0.5, y: 0.5, rx: Math.PI / 12, ry: 0, rz: 0, sx: 0, sy: Math.PI * 2 / 150, sz: 0 }], function (pts, rng) {
+startBackground([{ x: 0.5, y: 0.5, z: 0, rx: Math.PI / 12, ry: 0, rz: 0, sx: 0, sy: Math.PI * 2 / 150, sz: 0 }], function (pts, rng) {
   // A Fibonacci sphere with seeded jitter: irregular but evenly spread.
   // Just wide enough to hold the buttons, with evenly spaced dots.
   var buttons = document.querySelector("nav");

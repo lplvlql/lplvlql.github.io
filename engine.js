@@ -1,12 +1,12 @@
 // Shared background engine: one cloud of permanent dot homes, dynamic
 // proximity lines recomputed every frame, and two responses to input:
 // moving or scrolling shifts the camera so depth layers slide past each
-// other, and every input event jolts the dots to new nearby spots, from
-// where they drift home.
+// other while every shape turns with the motion; presses, releases and keys
+// jolt the dots to new nearby spots, from where they drift home.
 // Pages supply homes and a build function that fills pts and returns the
 // shape's radius; an optional link distance joins nearby homes with dotted lines.
-// Fixed world: homes are scattered once per load over a 2560x1440 field
-// that viewports crop.
+// The field is a 3D cloud, 2560 x 1440 and 1200 deep, scattered once per load;
+// it wraps at its edges so shifting never runs out.
 var WORLD_W = 2560, WORLD_H = 1440, DEPTH = 600; // field size and depth either side of its middle (px)
 // Homes at least minDist apart, each with a random starting angle and slow spin.
 function scatterHomes(minDist) {
@@ -17,7 +17,7 @@ function scatterHomes(minDist) {
     homes.push({
       x: x, y: y, z: (Math.random() * 2 - 1) * DEPTH, // the field is a 3D cloud
       rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2,
-      sx: (Math.random() - 0.5) * 0.25, sy: (Math.random() - 0.5) * 0.2, sz: (Math.random() - 0.5) * 0.15
+      sx: (Math.random() - 0.5) * 0.2, sy: (Math.random() - 0.5) * 0.2, sz: (Math.random() - 0.5) * 0.2 // radians per second
     });
   }
   return homes;
@@ -57,7 +57,7 @@ function startBackground(homes, build, link) {
   var CAM; // camera distance: gentle perspective at any size
   function resize() {
     var dpr = Math.min(2, devicePixelRatio);
-    if (canvas.clientWidth === W && canvas.clientHeight === H) return; // an address bar slid
+    if (canvas.clientWidth === W && canvas.clientHeight === H) return; // only a real size change rebuilds
     W = canvas.clientWidth; H = canvas.clientHeight;
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
@@ -74,19 +74,24 @@ function startBackground(homes, build, link) {
   // Camera shift (px) and its speed (px per second): moves push it, friction stops it.
   var camX = 0, camY = 0, velX = 0, velY = 0;
   var FIELD = 1500; // camera distance from the focal plane (px)
-  // Jolt: how far dots sit from home (0 to 1); each event draws new spots.
-  var jolt = 0, roll = 0;
+  var GLIDE = 400; // ms for a shift to coast to a stop and the dots to drift home
+  var PUSH = 1000 / GLIDE; // so a coasted shift moves the nearest layer as far as the input
+  var TURN = 0.002; // radians every shape turns per px the camera shifts
+  // Jolt: how far dots sit from home (0 to 1); each event draws new spots,
+  // and they stay out while a press is held.
+  var jolt = 0, roll = 0, held = false;
   var JUMP = 6; // px a dot may sit from home at full jolt
+  var DOT = 1.5, INK = "rgba(10,10,10,.8)"; // dot radius (px) and colour
 
   var centres = []; // visible homes on screen, for optional links
   function hop(n, k) { var h = Math.sin(n * 12.9898 + k * 78.233) * 43758.5453; return h - Math.floor(h) - 0.5; }
-  var animNow = 2989; // fixed starting moment, so first frames match every load
+  var animNow = 0;
   function wrap(v, size) { return v - size * Math.round(v / size); }
   function project() {
     var n = 0, t = animNow;
     centres = [];
     for (var ci = 0; ci < homes.length; ci++) {
-      var c = homes[ci], hz = c.z || 0;
+      var c = homes[ci], hz = c.z;
       // Parallax about the middle depth, like looking through a window: the nearest
       // homes move against the input, the furthest with it, and the field wraps.
       var hs = FIELD / (FIELD + hz);
@@ -94,7 +99,8 @@ function startBackground(homes, build, link) {
       var cyp = H / 2 + wrap((c.y - 0.5) * WORLD_H + camY * hz / DEPTH, WORLD_H) * hs;
       if (cxp < -256 || cxp > W + 256 || cyp < -256 || cyp > H + 256) continue; // offscreen: cropped, not generated
       centres.push(cxp, cyp);
-      var ax = c.rx + t / 1000 * c.sx, ay = c.ry + t / 1000 * c.sy, az = c.rz + t / 1000 * c.sz;
+      // As the camera shifts, every shape turns the way it goes, and stays turned.
+      var ax = c.rx + t / 1000 * c.sx - camY * TURN, ay = c.ry + t / 1000 * c.sy + camX * TURN, az = c.rz + t / 1000 * c.sz;
       var cax = Math.cos(ax), sax = Math.sin(ax), cay = Math.cos(ay), say = Math.sin(ay), caz = Math.cos(az), saz = Math.sin(az);
       for (var i = 0; i < pts.length; i++, n++) {
         var lx = pts[i][0], ly = pts[i][1], lz = pts[i][2];
@@ -112,8 +118,8 @@ function startBackground(homes, build, link) {
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = "rgba(10,10,10,.8)";
-    ctx.strokeStyle = "rgba(10,10,10,.8)";
+    ctx.fillStyle = INK;
+    ctx.strokeStyle = INK;
     ctx.lineWidth = 0.5;
     // Lines are dynamic: dots within range of each other
     // right now get a line, found through a spatial grid, bucketed
@@ -160,7 +166,7 @@ function startBackground(homes, build, link) {
       ctx.globalAlpha = sf[dj];
       ctx.beginPath();
       // Dots sit away from home by the jolt; lines stay on the homes.
-      ctx.arc(bx[dj] + hop(dj, roll) * away, by[dj] + hop(dj, roll + 0.5) * away, 1.5, 0, Math.PI * 2); // every dot the same size
+      ctx.arc(bx[dj] + hop(dj, roll) * away, by[dj] + hop(dj, roll + 0.5) * away, DOT, 0, Math.PI * 2); // every dot the same size
       ctx.fill();
     }
     // Optional links: homes nearer than `link` px join with a dotted line
@@ -173,8 +179,8 @@ function startBackground(homes, build, link) {
         ctx.globalAlpha = 1 - ld / link;
         ctx.beginPath();
         for (var lt = MAXZ; lt <= ld - MAXZ; lt += 8) {
-          ctx.moveTo(centres[la] + lx * lt / ld + 1.5, centres[la + 1] + ly * lt / ld);
-          ctx.arc(centres[la] + lx * lt / ld, centres[la + 1] + ly * lt / ld, 1.5, 0, Math.PI * 2);
+          ctx.moveTo(centres[la] + lx * lt / ld + DOT, centres[la + 1] + ly * lt / ld);
+          ctx.arc(centres[la] + lx * lt / ld, centres[la + 1] + ly * lt / ld, DOT, 0, Math.PI * 2);
         }
         ctx.fill();
       }
@@ -187,17 +193,15 @@ function startBackground(homes, build, link) {
   resize();
   if (reduceMotion) return;
 
-  // Only user input moves the background, never the page moving. Every event
-  // jolts the dots: fully for presses, releases and keys, by distance for moves.
-  // Moves and the wheel also shift the camera.
+  // Only user input moves the background, never the page moving. Moves and the
+  // wheel shift the camera; presses, releases and keys jolt the dots, and
+  // both combine: holding a press keeps the dots out while you move.
   var last = null;
   function react(e) {
-    var p = e.touches && e.touches[0] || e, dx = 0, dy = 0, strength = 1;
-    if (e.type === "wheel") { dx = -e.deltaX; dy = -e.deltaY; }
-    else if (/move$/.test(e.type) && last && p.clientX !== undefined) { dx = p.clientX - last[0]; dy = p.clientY - last[1]; }
-    if (/move$|wheel/.test(e.type)) strength = Math.min(1, (Math.abs(dx) + Math.abs(dy)) / 40);
-    velX -= dx * 2.5; velY -= dy * 2.5; // once coasted, the nearest layer has moved as far as the input, the other way
-    jolt = Math.max(jolt, strength); roll += 1;
+    var p = e.touches && e.touches[0] || e;
+    if (e.type === "wheel") { velX += e.deltaX * PUSH; velY += e.deltaY * PUSH; }
+    else if (/move$/.test(e.type)) { if (last && p.clientX !== undefined) { velX -= (p.clientX - last[0]) * PUSH; velY -= (p.clientY - last[1]) * PUSH; } }
+    else { jolt = 1; roll += 1; held = /down$|start$/.test(e.type); }
     last = p.clientX !== undefined ? [p.clientX, p.clientY] : null;
   }
   ["pointerdown", "pointermove", "pointerup", "touchstart", "touchmove", "touchend", "wheel", "keydown", "keyup"].forEach(function (type) {
@@ -208,10 +212,10 @@ function startBackground(homes, build, link) {
     var dt = lastFrame === null ? 16 : Math.min(50, now - lastFrame);
     lastFrame = now;
     animNow += dt;
-    var t = dt / 1000, drag = Math.exp(-dt / 400);
+    var t = dt / 1000, drag = Math.exp(-dt / GLIDE);
     velX *= drag; velY *= drag;
     camX += velX * t; camY += velY * t;
-    jolt *= Math.exp(-dt / 400); // dots drift home
+    if (!held) jolt *= drag; // dots drift home once let go
     project();
     draw();
     requestAnimationFrame(frame);

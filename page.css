@@ -1,19 +1,21 @@
 :root{--ink:rgba(10,10,10,.8);--wrap:720px;--frost:rgba(255,255,255,.2);--blur:blur(6px)}
 *{box-sizing:border-box}
+/* Text can't be selected, except in the .flat lists. */
 body{margin:0;user-select:none;background:#fff;color:var(--ink);font-family:monospace}
 a{color:var(--ink);text-decoration:none}
 a::before,label::before{content:"";display:inline-block;width:4px;height:4px;margin-right:4px;border-radius:50%;background:currentColor;vertical-align:middle}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 /* Link pill: hover shades it, press darkens and shrinks it; the text never moves. */
-.screen-nav a,.contact>*,.content h2 a,.content h2 label,.stark-btn{position:relative;isolation:isolate}
-.screen-nav a::after,.contact>*::after,.content h2 a::after,.content h2 label::after,.stark-btn::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:8px;transition:background-color .2s,transform .1s}
-.screen-nav a:hover::after,.contact a:hover::after,.content h2 a:hover::after,.content h2 label:hover::after,.stark-btn:hover::after{background:rgba(10,10,10,.2)}
-.screen-nav a:active::after,.contact a:active::after,.content h2 a:active::after,.content h2 label:active::after,.stark-btn:active::after{background:rgba(10,10,10,.4);transform:scale(.94)}
+.screen-nav a,.contact>*,.content h2 a,.content h2 label,.hub-btn{position:relative;isolation:isolate}
+.screen-nav a::after,.contact>*::after,.content h2 a::after,.content h2 label::after,.hub-btn::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:8px;transition:background-color .2s,transform .1s}
+.screen-nav a:hover::after,.contact a:hover::after,.content h2 a:hover::after,.content h2 label:hover::after,.hub-btn:hover::after{background:rgba(10,10,10,.2)}
+.screen-nav a:active::after,.contact a:active::after,.content h2 a:active::after,.content h2 label:active::after,.hub-btn:active::after{background:rgba(10,10,10,.4);transform:scale(.94)}
+.screen-nav a::after,.contact>*::after,.hub-btn::after{background:var(--frost);backdrop-filter:var(--blur)}
 canvas{position:fixed;top:0;left:0;width:100%;height:100vh;pointer-events:none}
 /* The frosted column behind the text, as long as the page. */
 .pager main::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(var(--wrap),100%);background:var(--frost);backdrop-filter:var(--blur);pointer-events:none}
 main{position:relative;z-index:1}
-/* The gap keeps the next section out of sight under a see-through address bar. */
+/* Sections stand apart, so only one shows at a stop. */
 .pager main{display:flex;flex-direction:column;gap:120px}
 /* Each section fills the window; its content is centred, or starts at the top when longer. */
 main>section{position:relative;min-height:100vh;display:flex;flex-direction:column}
@@ -91,11 +93,10 @@ main>section:target .content-panel{animation:fadein .6s ease}
 .group span{position:absolute;top:50%;left:13px;transform:translate(-50%,-50%) rotate(-90deg);font-size:12px;line-height:1}
 .group.off,.loop.off{opacity:.4;border-style:dashed}
 .rig+.status{text-align:center;margin:0;min-height:1.6em}
-/* Hub: centred frosted buttons over the sphere. */
-.stark{overflow:hidden}
+/* Homepage: centred frosted buttons over the sphere. */
+.hub{overflow:hidden}
 .view{position:fixed;top:0;left:0;right:0;height:100vh;z-index:1;display:flex;align-items:center;justify-content:center;padding:24px}
-.stark-stack{display:flex;flex-direction:column;gap:8px;width:min(320px,80vw)}
-.stark-btn{display:flex;align-items:center;justify-content:center;padding:16px 24px;font-size:16px;font-weight:700;letter-spacing:.16em}
-.screen-nav a::after,.contact>*::after,.stark-btn::after{background:var(--frost);backdrop-filter:var(--blur)}
-.stark-row{display:flex;gap:8px}
-.stark-row .stark-btn{flex:1;padding:8px 4px;font-size:12px}
+.hub-stack{display:flex;flex-direction:column;gap:8px;width:min(320px,80vw)}
+.hub-btn{display:flex;align-items:center;justify-content:center;padding:16px 24px;font-size:16px;font-weight:700;letter-spacing:.16em}
+.hub-row{display:flex;gap:8px}
+.hub-row .hub-btn{flex:1;padding:8px 4px;font-size:12px}

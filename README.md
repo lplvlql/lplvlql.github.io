@@ -8,7 +8,7 @@ Project hub. The root page links to each project:
 - `mister-tidy/`
 - `usual-time/`
 
-Shared files: `page.css` (all styles), `page.js` (screen navs and footer), `engine.js` (dotted backgrounds). Plain static files, no build step, served by GitHub Pages.
+Shared files: `page.css` (all styles), `page.js` (the row of section numbers and the row of links), `engine.js` (dotted backgrounds). Plain static files, no build step, served by GitHub Pages.
 
 Preview locally:
 
